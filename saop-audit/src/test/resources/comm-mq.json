@@ -1,0 +1,52 @@
+{
+    "centerCfgs": [
+        {
+            "name": "BPCenter",
+            "clusters": [
+                {
+                    "name": "cluster-1",
+                    "type": "RocketMQ",
+                    "url": "192.168.1.81:9876;192.168.1.82:9876"
+                },
+                {
+                    "name": "cluster-2",
+                    "type": "JvmQueue",
+                    "url": "localhost"
+
+                }
+            ],
+            "producerCfg": {
+                "resenddelay": 1000,
+                "resendTimes": 3,
+                "replyTimeOut": 3000
+            },
+            "destinations": {
+                "queue": [],
+                "topic": [
+                    {
+                        "clusters": "cluster-2",
+                        "name": "TopicUser",
+                        "number": 4,
+                        "order": false
+                    }
+                ]
+            },
+            "subscribes": [
+                {
+                    "implclass": [
+                        "com.asiainfo.crm.blueprint.comp.mq.NewUserProcessor"
+                    ],
+                    "subDestinations": [
+                        {
+                            "topic": "TopicUser",
+                            "tag": "newuser"
+                        }
+                    ],
+                    "consumeType": "push",
+                    "consumeMessageMaxNums": 1,
+                    "processThreadNums": 10
+                }
+            ]
+        }
+    ]
+}

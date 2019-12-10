@@ -1,0 +1,7 @@
+<ruleConfig xmlns="http://ddal.raptor.studio/rule-config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ddal.raptor.studio/rule-config">
+	<shardRules>
+		<shardRule name="database-rule" shardColumn="id" param="2"
+			algorithm="studio.raptor.ddal.common.algorithm.embed.DefaultModSingleKeyAlgorithm" />
+	</shardRules>
+</ruleConfig>

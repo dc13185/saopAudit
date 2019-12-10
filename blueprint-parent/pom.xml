@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.asiainfo.crm</groupId>
+		<artifactId>crmstan-parent</artifactId>
+		<version>1.5.3-dev-SNAPSHOT</version>
+	</parent>
+	
+    <artifactId>blueprint-parent</artifactId>
+    <version>0.0.1</version>
+    <packaging>pom</packaging>
+    <name>blueprint-parent</name>
+
+    <properties>
+        <project.module.version>1.0.0</project.module.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.7</jdk.version>
+    </properties>
+
+    <dependencies>
+    </dependencies>
+
+    <modules>
+        <module>../saop-audit</module>
+        <module>../saop-audit-model</module>
+        <module>../saop-audit-service</module>
+        <module>../saop_audit_ftpUpload</module>
+    </modules>
+</project>

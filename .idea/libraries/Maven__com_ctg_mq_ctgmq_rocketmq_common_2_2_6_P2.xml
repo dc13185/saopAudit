@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.ctg.mq:ctgmq-rocketmq-common:2.2.6_P2">
+    <CLASSES>
+      <root url="jar://F:/maven_repository/com/ctg/mq/ctgmq-rocketmq-common/2.2.6_P2/ctgmq-rocketmq-common-2.2.6_P2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://F:/maven_repository/com/ctg/mq/ctgmq-rocketmq-common/2.2.6_P2/ctgmq-rocketmq-common-2.2.6_P2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://F:/maven_repository/com/ctg/mq/ctgmq-rocketmq-common/2.2.6_P2/ctgmq-rocketmq-common-2.2.6_P2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

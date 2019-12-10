@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mdas xmlns="http://www.asiainfo-linkage.com/schema/mdas-1.0">
+  <mda className="com.asiainfo.crm.bcomm.BCommMDA">
+  	<const type="String" name="REMOTE_INVOKE_MODE" value="http" description="远程调用方式，http，csf"/>
+  </mda>
+  <mda className="com.asiainfo.crm.blueprint.intf">
+  	<const type="Integer" name="BUS_FLAG_GAIN_ENGINE_MAX_THREAD_CNT" value="5"/>
+  	<const type="String" name="LOG_PLAT_URL" value="http://192.168.1.229:8080/hlog-apps/api/_search"/>
+  </mda>
+</mdas>
+

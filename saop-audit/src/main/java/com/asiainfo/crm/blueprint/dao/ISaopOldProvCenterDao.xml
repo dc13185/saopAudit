@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.asiainfo.crm.blueprint.dao.ISaopOldProvCenterDao">
+
+	<!-- c网稽核新增 -->
+	<insert id="saveCProdAudit" parameterType="java.util.Map">
+		insert into CEP_PROD_C
+		values
+		  (#{mdn},
+		   #{imsi},
+		   #{state},
+		   #{provinceCode},
+		   to_char(sysdate,'yyyy-MM-dd HH:mm:ss'),
+		   to_char(sysdate,'yyyy-MM-dd HH:mm:ss'),
+		   #{payType},
+		   #{cityCode},
+		   #{lteimsi,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- c网稽核删除 -->
+	<delete id="delCProdAudit" parameterType="java.util.Map">
+		delete from CEP_PROD_C t where t.mdn = #{mdn} or t.imsi = #{imsi}
+	</delete>
+	
+	<!-- c网稽核更新 -->
+	<update id="updateCProdAudit" parameterType="java.util.Map">
+		update CEP_PROD_C t
+		   set t.imsi         = #{imsi},
+		       t.state        = #{state},
+		       t.provincecode = #{provinceCode},
+		       t.updatetime   = to_char(sysdate,'yyyy-MM-dd HH:mm:ss'),
+		       t.paytype      = #{payType},
+		       t.lanid        = #{cityCode},
+		       t.lteimsi      = #{lteimsi,jdbcType=VARCHAR}
+		 where t.mdn = #{mdn}
+	</update>
+	
+    <!-- c网稽核查询 -->
+    <select id="queryCProdAudit" parameterType="java.util.Map" resultType="java.lang.Integer">
+    	select count(1) from CEP_PROD_C t where t.mdn = #{mdn} or t.imsi = #{imsi}
+    </select>
+</mapper>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.aictcrm:comm-mq-ext-rocketmq:0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://F:/maven_repository/com/aictcrm/comm-mq-ext-rocketmq/0.0.1-SNAPSHOT/comm-mq-ext-rocketmq-0.0.1-20170726.090511-5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://F:/maven_repository/com/aictcrm/comm-mq-ext-rocketmq/0.0.1-SNAPSHOT/comm-mq-ext-rocketmq-0.0.1-20170726.090511-5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://F:/maven_repository/com/aictcrm/comm-mq-ext-rocketmq/0.0.1-SNAPSHOT/comm-mq-ext-rocketmq-0.0.1-20170726.090511-5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,232 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="saop-audit-service:war exploded">
+    <output-path>$PROJECT_DIR$/saop-audit-service/target/saop-audit-service</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <exploded>true</exploded>
+        <module>saop-audit-service</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="saop-audit-service" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="archive" name="saop-audit-0.1.jar">
+            <element id="module-output" name="saop-audit" />
+          </element>
+          <element id="archive" name="saop-audit-model-0.1.jar">
+            <element id="module-output" name="saop-audit-model" />
+          </element>
+          <element id="library" level="project" name="Maven: com.alibaba:fastjson:1.2.31" />
+          <element id="archive" name="saop_audit_ftpUpload-0.1.jar">
+            <element id="module-output" name="saop_audit_ftpUpload" />
+          </element>
+          <element id="library" level="project" name="Maven: org.apache.axis:axis:1.4" />
+          <element id="library" level="project" name="Maven: org.apache.axis:axis-jaxrpc:1.4" />
+          <element id="library" level="project" name="Maven: org.apache.axis:axis-saaj:1.4" />
+          <element id="library" level="project" name="Maven: wsdl4j:wsdl4j:1.5.1" />
+          <element id="library" level="project" name="Maven: com.jcraft:jsch:0.1.53" />
+          <element id="library" level="project" name="Maven: commons-net:commons-net:3.2" />
+          <element id="library" level="project" name="Maven: org.apache.poi:poi:3.9" />
+          <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.5" />
+          <element id="library" level="project" name="Maven: redis.clients:jedis:2.9.0" />
+          <element id="file-copy" path="F:/maven_repository/com/asiainfo/crm/crmstan-plan/1.5.3-SNAPSHOT/crmstan-plan-1.5.3-20190409.062911-2.jar" output-file-name="crmstan-plan-1.5.3-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/asiainfo/crm/al-bcomm/1.5.3-SNAPSHOT/al-bcomm-1.5.3-20190517.091615-6.jar" output-file-name="al-bcomm-1.5.3-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/asiainfo/crm/sm-auth-busi/0.0.3-SNAPSHOT/sm-auth-busi-0.0.3-20190326.031940-9.jar" output-file-name="sm-auth-busi-0.0.3-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/al/al-dsession/1.1.0-SNAPSHOT/al-dsession-1.1.0-20181116.085335-16.jar" output-file-name="al-dsession-1.1.0-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpmime:4.5.3" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient-osgi:4.5.3" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient-cache:4.5.3" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:fluent-hc:4.5.3" />
+          <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp:3.6.0" />
+          <element id="library" level="project" name="Maven: com.squareup.okio:okio:1.11.0" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.8.7" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.8.7" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.8.7" />
+          <element id="library" level="project" name="Maven: javax.servlet:servlet-api:2.4" />
+          <element id="library" level="project" name="Maven: com.esotericsoftware.kryo:kryo:2.21" />
+          <element id="library" level="project" name="Maven: com.esotericsoftware.reflectasm:reflectasm:shaded:1.07" />
+          <element id="library" level="project" name="Maven: com.esotericsoftware.minlog:minlog:1.2" />
+          <element id="file-copy" path="F:/maven_repository/com/al/al-common/1.0.2-SNAPSHOT/al-common-1.0.2-20171127.101205-4.jar" output-file-name="al-common-1.0.2-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/asiainfo/angel/angel-core/2.1.0-SNAPSHOT/angel-core-2.1.0-20171205.131958-4.jar" output-file-name="angel-core-2.1.0-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: ch.qos.logback:logback-classic:1.1.3" />
+          <element id="library" level="project" name="Maven: ch.qos.logback:logback-core:1.1.3" />
+          <element id="library" level="project" name="Maven: org.slf4j:jcl-over-slf4j:1.7.12" />
+          <element id="library" level="project" name="Maven: org.codehaus.woodstox:stax2-api:4.0.0" />
+          <element id="file-copy" path="F:/maven_repository/com/asiainfo/angel/angel-invoke/2.2.1-SNAPSHOT/angel-invoke-2.2.1-20181206.031605-1.jar" output-file-name="angel-invoke-2.2.1-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: org.aspectj:aspectjweaver:1.7.1" />
+          <element id="file-copy" path="F:/maven_repository/com/asiainfo/al-comm-seq/0.0.1-SNAPSHOT/al-comm-seq-0.0.1-20171124.043700-7.jar" output-file-name="al-comm-seq-0.0.1-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/cmdb-client/0.0.6-SNAPSHOT/cmdb-client-0.0.6-20180829.102329-2.jar" output-file-name="cmdb-client-0.0.6-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/cmdb-core/0.0.6-SNAPSHOT/cmdb-core-0.0.6-20180829.102313-2.jar" output-file-name="cmdb-core-0.0.6-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.8.0" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/cmdb-foundation/0.0.6-SNAPSHOT/cmdb-foundation-0.0.6-20180829.102303-2.jar" output-file-name="cmdb-foundation-0.0.6-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: com.google.inject:guice:4.1.0" />
+          <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/ddal-jdbc/3.2.5.4-SNAPSHOT/ddal-jdbc-3.2.5.4-20190331.144536-2.jar" output-file-name="ddal-jdbc-3.2.5.4-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/ddal-core/3.2.5.4-SNAPSHOT/ddal-core-3.2.5.4-20190331.144525-2.jar" output-file-name="ddal-core-3.2.5.4-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/ddal-sqlparser/3.2.5.4-SNAPSHOT/ddal-sqlparser-3.2.5.4-20190331.144435-2.jar" output-file-name="ddal-sqlparser-3.2.5.4-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:3.0.1" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/ddal-logclient/3.2.5.4-SNAPSHOT/ddal-logclient-3.2.5.4-20190331.144445-2.jar" output-file-name="ddal-logclient-3.2.5.4-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/ddal-config/3.2.5.4-SNAPSHOT/ddal-config-3.2.5.4-20190331.144200-2.jar" output-file-name="ddal-config-3.2.5.4-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/ddal-common/3.2.5.4-SNAPSHOT/ddal-common-3.2.5.4-20190425.090256-3.jar" output-file-name="ddal-common-3.2.5.4-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: commons-httpclient:commons-httpclient:3.1" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/raptor-gid/4.1.1-SNAPSHOT/raptor-gid-4.1.1-20181115.050655-1.jar" output-file-name="raptor-gid-4.1.1-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: org.softee:pojo-mbean:1.1" />
+          <element id="library" level="project" name="Maven: com.google.guava:guava:20.0" />
+          <element id="library" level="project" name="Maven: org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1.1" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.12" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.8.7" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.7" />
+          <element id="library" level="project" name="Maven: com.fasterxml.woodstox:woodstox-core:5.0.3" />
+          <element id="file-copy" path="F:/maven_repository/com/al/spring-zext/1.1.0-SNAPSHOT/spring-zext-1.1.0-20181102.085628-3.jar" output-file-name="spring-zext-1.1.0-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/al/crm/nosql/nosql-ctg-plugin/1.4.1-SNAPSHOT/nosql-ctg-plugin-1.4.1-20190312.063917-6.jar" output-file-name="nosql-ctg-plugin-1.4.1-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: org.ow2.asm:asm:5.0.1" />
+          <element id="file-copy" path="F:/maven_repository/com/al/crm/nosql/nosql-base/1.4.1-SNAPSHOT/nosql-base-1.4.1-20190403.013114-6.jar" output-file-name="nosql-base-1.4.1-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-context-support:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: com.ctg.itrdc.cache:ctg-cache-nclient:2.4.0" />
+          <element id="library" level="project" name="Maven: commons-beanutils:commons-beanutils:1.9.2" />
+          <element id="library" level="project" name="Maven: commons-cli:commons-cli:1.2" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-jcs-core:2.1" />
+          <element id="library" level="project" name="Maven: org.fusesource:sigar:1.6.4" />
+          <element id="library" level="project" name="Maven: log4j:log4j:1.2.15" />
+          <element id="library" level="project" name="Maven: jaxen:jaxen:1.1.6" />
+          <element id="library" level="project" name="Maven: cglib:cglib-nodep:2.2.2" />
+          <element id="library" level="project" name="Maven: joda-time:joda-time:2.9.4" />
+          <element id="library" level="project" name="Maven: com.jolbox:bonecp:0.7.1.RELEASE" />
+          <element id="library" level="project" name="Maven: org.apache.zookeeper:zookeeper:3.4.6" />
+          <element id="library" level="project" name="Maven: jline:jline:0.9.94" />
+          <element id="library" level="project" name="Maven: io.netty:netty:3.7.0.Final" />
+          <element id="file-copy" path="F:/maven_repository/com/al/crm/nosql/nosql-cache/1.4.1-SNAPSHOT/nosql-cache-1.4.1-20190117.081047-5.jar" output-file-name="nosql-cache-1.4.1-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: com.101tec:zkclient:0.10" />
+          <element id="library" level="project" name="Maven: com.alibaba:dubbo:2.5.3" />
+          <element id="file-copy" path="F:/maven_repository/com/al/crm/nosql/nosql-cluster-plugin/1.4.1-SNAPSHOT/nosql-cluster-plugin-1.4.1-20190509.061111-8.jar" output-file-name="nosql-cluster-plugin-1.4.1-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/al/crm/nosql/nosql-cache-multilevel/1.4.1-SNAPSHOT/nosql-cache-multilevel-1.4.1-20190312.064147-6.jar" output-file-name="nosql-cache-multilevel-1.4.1-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: com.alibaba:transmittable-thread-local:2.5.1" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-core:4.8.1" />
+          <element id="library" level="project" name="Maven: com.google.inject.extensions:guice-assistedinject:4.1.0" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.5" />
+          <element id="library" level="project" name="Maven: cglib:cglib:3.2.4" />
+          <element id="library" level="project" name="Maven: org.apache.ant:ant:1.9.6" />
+          <element id="library" level="project" name="Maven: org.apache.ant:ant-launcher:1.9.6" />
+          <element id="file-copy" path="F:/maven_repository/com/al/crm/nosql/nosql-cache-plugin-mybatis/1.4.1-SNAPSHOT/nosql-cache-plugin-mybatis-1.4.1-20190117.081050-5.jar" output-file-name="nosql-cache-plugin-mybatis-1.4.1-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/al/al-uniconfig/1.0.3-SNAPSHOT/al-uniconfig-1.0.3-20171015.101911-3.jar" output-file-name="al-uniconfig-1.0.3-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/al/al-notifier/1.0.1-SNAPSHOT/al-notifier-1.0.1-20140504.071305-18.jar" output-file-name="al-notifier-1.0.1-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: org.apache.mina:mina-core:2.0.7" />
+          <element id="file-copy" path="F:/maven_repository/com/aictcrm/comm-idempotent/1.0-SNAPSHOT/comm-idempotent-1.0-20171011.083045-1.jar" output-file-name="comm-idempotent-1.0-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/asiainfo/angel/angel-persistence/2.3.3-SNAPSHOT/angel-persistence-2.3.3-20181213.020639-7.jar" output-file-name="angel-persistence-2.3.3-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: uk.com.robust-it:cloning:1.9.6" />
+          <element id="library" level="project" name="Maven: org.objenesis:objenesis:2.6" />
+          <element id="library" level="project" name="Maven: org.mybatis:mybatis:3.2.8" />
+          <element id="library" level="project" name="Maven: com.github.jsqlparser:jsqlparser:0.9.1" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/databus-client/0.1.9-SNAPSHOT/databus-client-0.1.9-20190327.085809-1.jar" output-file-name="databus-client-0.1.9-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: org.hibernate:hibernate-validator:5.1.3.Final" />
+          <element id="library" level="project" name="Maven: org.jboss.logging:jboss-logging:3.1.3.GA" />
+          <element id="library" level="project" name="Maven: com.fasterxml:classmate:1.0.0" />
+          <element id="library" level="project" name="Maven: javax.el:javax.el-api:2.2.4" />
+          <element id="library" level="project" name="Maven: org.glassfish.web:javax.el:2.2.4" />
+          <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.3.1" />
+          <element id="library" level="project" name="Maven: io.protostuff:protostuff-core:1.6.0" />
+          <element id="library" level="project" name="Maven: io.protostuff:protostuff-api:1.6.0" />
+          <element id="library" level="project" name="Maven: io.protostuff:protostuff-runtime:1.6.0" />
+          <element id="library" level="project" name="Maven: io.protostuff:protostuff-collectionschema:1.6.0" />
+          <element id="library" level="project" name="Maven: org.fusesource.hawtbuf:hawtbuf:1.11" />
+          <element id="library" level="project" name="Maven: org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1" />
+          <element id="library" level="project" name="Maven: org.apache.activemq:activemq-jms-pool:5.14.4" />
+          <element id="library" level="project" name="Maven: org.apache.geronimo.specs:geronimo-jta_1.0.1B_spec:1.0.1" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/mq-interface/0.0.2-SNAPSHOT/mq-interface-0.0.2-20190919.131107-3.jar" output-file-name="mq-interface-0.0.2-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/databus-ctg-client/0.0.2-SNAPSHOT/databus-ctg-client-0.0.2-20190922.093710-5.jar" output-file-name="databus-ctg-client-0.0.2-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: io.netty:netty-all:4.0.23.Final" />
+          <element id="library" level="project" name="Maven: dom4j:dom4j:1.6" />
+          <element id="library" level="project" name="Maven: xml-apis:xml-apis:1.0.b2" />
+          <element id="library" level="project" name="Maven: com.ctg.mq:ctg-mq-api:2.2.6_P2" />
+          <element id="library" level="project" name="Maven: com.ctg.mq:ctg-mq-rocketmq:2.2.6_P2" />
+          <element id="library" level="project" name="Maven: javax.annotation:javax.annotation-api:1.2" />
+          <element id="library" level="project" name="Maven: com.ctg.mq:ctgmq-rocketmq-common:2.2.6_P2" />
+          <element id="library" level="project" name="Maven: com.ctg.mq:ctgmq-rocketmq-srvutil:2.2.6_P2" />
+          <element id="library" level="project" name="Maven: com.ctg.mq:ctgmq-rocketmq-client:2.2.6_P2" />
+          <element id="library" level="project" name="Maven: com.ctg.mq:ctgmq-rocketmq-remoting:2.2.6_P2" />
+          <element id="library" level="project" name="Maven: com.ctg.mq:ctgmq-rocketmq-tools:2.2.6_P2" />
+          <element id="library" level="project" name="Maven: javax.validation:validation-api:1.1.0.Final" />
+          <element id="file-copy" path="F:/maven_repository/studio/raptor/databus-listen-client/0.0.2-SNAPSHOT/databus-listen-client-0.0.2-20190319.094413-4.jar" output-file-name="databus-listen-client-0.0.2-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: com.zaxxer:HikariCP-java7:2.4.11" />
+          <element id="library" level="project" name="Maven: mysql:mysql-connector-java:5.1.30" />
+          <element id="library" level="project" name="Maven: com.oracle:ojdbc7:12.1.0.2.0" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-core:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.2" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-context:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-aop:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: aopalliance:aopalliance:1.0" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-beans:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-expression:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-web:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-jdbc:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-tx:4.1.4.RELEASE" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-pool2:2.4.2" />
+          <element id="library" level="project" name="Maven: csf:csf-client:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-common:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-protocol-http:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-protocol-http-server:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-servicerouter:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-zookeeperclient:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-executor:2.2.6.3" />
+          <element id="file-copy" path="F:/maven_repository/csf/csf-protocol-socket/2.2.2-SNAPSHOT/csf-protocol-socket-2.2.2-20180426.095507-4.jar" output-file-name="csf-protocol-socket-2.2.2-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: com.ai.aif:log4x:2.3" />
+          <element id="library" level="project" name="Maven: commons-digester:commons-digester:1.7" />
+          <element id="library" level="project" name="Maven: org.apache.curator:curator-framework:2.10.0" />
+          <element id="library" level="project" name="Maven: org.apache.curator:curator-client:2.10.0" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpcore:4.4.4" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient:4.5.2" />
+          <element id="library" level="project" name="Maven: com.netflix.hystrix:hystrix-core:1.5.5" />
+          <element id="library" level="project" name="Maven: com.netflix.archaius:archaius-core:0.4.1" />
+          <element id="library" level="project" name="Maven: commons-configuration:commons-configuration:1.8" />
+          <element id="library" level="project" name="Maven: org.hdrhistogram:HdrHistogram:2.1.9" />
+          <element id="library" level="project" name="Maven: commons-io:commons-io:2.4" />
+          <element id="library" level="project" name="Maven: csf:csf-db:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-protocol-local:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-protocol-remote:2.2.6.3" />
+          <element id="library" level="project" name="Maven: csf:csf-server:2.2.1" />
+          <element id="library" level="project" name="Maven: aif.appframe:appframe_exeframe_cache:1.0" />
+          <element id="library" level="project" name="Maven: aif.appframe:appframe_ext_flyingserver:1.0" />
+          <element id="library" level="project" name="Maven: aif.appframe:appframe:6.0" />
+          <element id="library" level="project" name="Maven: aif.common:common:1.0" />
+          <element id="library" level="project" name="Maven: aif.third.concurrent:concurrent:1.0" />
+          <element id="library" level="project" name="Maven: aif.third.borlandxml:borlandxml:1.0" />
+          <element id="library" level="project" name="Maven: org.jdom:jdom:1.1" />
+          <element id="library" level="project" name="Maven: aif.third.xercesImpl:xercesImpl:1.0" />
+          <element id="library" level="project" name="Maven: aif.third.rowset:rowset:1.0" />
+          <element id="library" level="project" name="Maven: aif.third.j2ee:j2ee:1.0" />
+          <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.6" />
+          <element id="library" level="project" name="Maven: commons-dbcp:commons-dbcp:1.3" />
+          <element id="library" level="project" name="Maven: commons-pool:commons-pool:1.5.4" />
+          <element id="library" level="project" name="Maven: org.javassist:javassist:3.18.1-GA" />
+          <element id="library" level="project" name="Maven: opensymphony:quartz-all:1.6.0" />
+          <element id="library" level="project" name="Maven: org.apache.curator:curator-recipes:2.10.0" />
+          <element id="library" level="project" name="Maven: io.reactivex:rxjava:1.1.8" />
+          <element id="file-copy" path="F:/maven_repository/com/aictcrm/comm-mq-databusex/0.0.3-SNAPSHOT/comm-mq-databusex-0.0.3-20190327.092114-1.jar" output-file-name="comm-mq-databusex-0.0.3-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/aictcrm/comm-mq/0.0.3.2-SNAPSHOT/comm-mq-0.0.3.2-20190327.092010-1.jar" output-file-name="comm-mq-0.0.3.2-SNAPSHOT.jar" />
+          <element id="file-copy" path="F:/maven_repository/com/aictcrm/comm-mq-ext-rocketmq/0.0.1-SNAPSHOT/comm-mq-ext-rocketmq-0.0.1-20170726.090511-5.jar" output-file-name="comm-mq-ext-rocketmq-0.0.1-SNAPSHOT.jar" />
+          <element id="library" level="project" name="Maven: aif.msgframe:msgframe-client:2.0" />
+          <element id="library" level="project" name="Maven: aif.msgframe:msgframe-common:2.0" />
+          <element id="library" level="project" name="Maven: aif.msgframe:msgframe-server:2.0" />
+          <element id="library" level="project" name="Maven: aif.msgframe:xmlmsgframe:2.7.4" />
+          <element id="library" level="project" name="Maven: aif.msgframe:xbean:1.0" />
+          <element id="library" level="project" name="Maven: aif.third.amber-client:amber-client:1.1.1" />
+          <element id="library" level="project" name="Maven: javax.management.j2ee:javax.management.j2ee-api:1.1.1" />
+          <element id="library" level="project" name="Maven: commons-collections:commons-collections:3.2.1" />
+          <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.4" />
+          <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.4" />
+          <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-jaxrs:1.9.4" />
+          <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-xc:1.9.4" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/saop-audit-service/target/saop-audit-service/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="saop-audit-service/web/Web" />
+    </root>
+  </artifact>
+</component>

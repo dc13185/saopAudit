@@ -1,0 +1,1140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.asiainfo.crm.blueprint.dao.ISaopAuditDao">
+    <!-- 稽核数据来源表映射关系 -->
+	<resultMap type="com.asiainfo.crm.blueprint.model.AuditDataOrignEntity" id="AuditDataOrign">
+       <result column="audit_data_origin_id" property="auditDataOriginId" javaType="string"/>
+       <result column="saop_log_id" property="saopLogId" javaType="string"/>
+       <result column="saop_srvc_inst_id" property="saopSrvcInstId" javaType="string"/>
+       <result column="saop_primary_log_id" property="saopPrimaryLogId" javaType="string"/>
+       <result column="process_state" property="processState" javaType="string"/>
+       <result column="process_result" property="processResult" javaType="string"/>
+       <result column="create_time" property="createTime" javaType="String"/>
+       <result column="version" property="version" javaType="Date"/>
+    </resultMap>
+   
+    <!-- 查询稽核数据来源表，saop侦听调audit -->
+	<select id="queryAuditDataOrignEntity" parameterType="java.lang.String" resultMap="AuditDataOrign">
+	   select audit_data_origin_id,
+		      saop_log_id,
+		      saop_srvc_inst_id,
+		      saop_primary_log_id,
+		      process_state,
+		      process_result,
+		      create_time,
+		      version
+		 from audit_data_origin t
+		where t.audit_data_origin_id = #{auditOriginDataId}
+	</select>
+	
+	<!-- 通过服务实例ID查busCode和serviceCode -->
+    <select id="querySaopAuditBusServicecode" parameterType="java.lang.String" resultType="java.util.Map">
+        select r.bus_code,r.service_code from service_inst r where r.srvc_inst_id = #{saopSrvcInstId}
+    </select>
+    
+    <!-- 从落地表中查报文 -->
+	<select id="getXmlByLogid" parameterType="java.lang.String" resultType="java.lang.Object">
+		select t.in_param_msg from transact_log_info t where t.log_id = #{saopLogId}
+    </select>
+    
+    <!-- 入稽核表后更新数据来源表状态标识 -->
+    <update id="updateAuditDataOrign" parameterType="java.util.Map">
+    	update audit_data_origin t set t.process_state = #{processState},t.process_result = #{processResult}, t.version = sysdate where t.audit_data_origin_id =#{auditOriginDataId}
+    </update>
+    
+    <!-- 稽核错误日志 -->
+	<insert id="insertAuditFailLog" parameterType="java.util.Map" >
+		INSERT INTO dep_audit_fail_log
+		        (transaction_id,
+		         bus_code,
+		          <if test="orderId != null and orderId != ''">
+		         ORDER_ID,
+		         </if>
+		         <if test="groupId != null and groupId != ''">
+		         GROUP_ID,
+		         </if>
+		         <if test="phoneNumber != null and phoneNumber != ''">
+		         phone_number,
+		         </if>
+		         creat_dt,
+		         remark)
+		      values
+		        (#{transactionId},
+		         #{busCode},
+		         <if test="orderId != null and orderId != ''">
+		         #{orderId},
+		         </if>
+		         <if test="groupId != null and groupId != ''">
+		         #{groupId},
+		         </if>
+		         <if test="phoneNumber != null and phoneNumber != ''">
+		         #{phoneNumber},
+		         </if>
+		         sysdate,
+		         #{errM})
+	</insert>
+     
+    <!-- 稽核错误日志 -->
+	<insert id="insertAuditErrLog" parameterType="java.util.Map">
+		insert into dep_4gaudit_errlog values(#{I_TansID}, #{I_Params}, #{I_ErrMsg})
+	</insert> 
+    
+    <!-- 4G订单信息稽核保存 -->
+    <insert id="insertOrderInfoAudit4G" parameterType="java.util.Map">
+		insert into dep_order_info_audit_4g
+		  (cust_order_id, province_id, lan_id, deal_type, deal_dt)
+		values
+		  (#{v_ORDERID},
+		   #{v_PROVINCEID},
+		   #{v_LANID},
+		   #{v_DEALTYPE},
+		   to_date(#{v_DEALDT}, 'yyyy-mm-dd hh24:mi:ss'))
+     </insert>
+     
+     <!-- 4G集团订单费用稽核   订单费用稽核表记录数 -->
+     <select id="queryOrderInfoCount4G" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(1)
+		  from dep_order_info_audit_4g
+		 where cust_order_id = #{orderid}
+     </select>
+     
+     <!-- 4G集团订单费用稽核   订单费用稽核表记录数 -->
+     <select id="queryOrderChargeCount4G" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1)
+		  from dep_order_charge_audit_4g
+		 where cust_order_id = #{v_ORDERID}
+		   and acct_item_type_id = #{v_ACCTTYPE}
+     </select>
+     
+     <!-- 4G集团订单费用稽核  费用查询 -->
+ 	 <select id="queryOrderChargeAmount4G" parameterType="java.util.Map" resultType="java.lang.String">
+		select amount
+		  from dep_order_charge_audit_4g
+		 where cust_order_id = #{v_ORDERID}
+		   and acct_item_type_id = #{v_ACCTTYPE}
+     </select>
+     
+     <!-- 4G集团订单费用稽核-->
+     <update id = "updateOrderChargeAudit4G" parameterType="java.util.Map">
+		update dep_order_charge_audit_4g
+		   set amount = #{v_AMOUNT}
+		 where cust_order_id = #{v_ORDERID}
+		   and acct_item_type_id = #{v_ACCTTYPE}
+     </update>
+     
+     <!-- 4G 集团订单费用稽核  保存费用 -->
+     <insert id="insertOrderCharge4G" parameterType="java.util.Map">
+		insert into dep_order_charge_audit_4g
+		  (cust_order_id,
+		   acct_item_type_id,
+		   amount,
+		   province_id,
+		   lan_id,
+		   deal_type,
+		   deal_dt)
+		values
+		  (#{v_ORDERID},
+		   #{v_ACCTTYPE},
+		   #{v_AMOUNT},
+		   #{v_PROVINCEID},
+		   #{v_LANID},
+		   #{v_DEALTYPE},
+		   to_date(#{v_REQTIME}, 'yyyy-mm-dd hh24:mi:ss'))
+     </insert>
+     
+     
+     <!-- 4G产品状态查询 -->
+     <select id="queryActiveAudit4G" parameterType="java.lang.String" resultType="java.lang.Integer">
+     	select count(1) from dep_prod_activation_audit_4g where phone_number = #{v_PHONENUMBER}
+     </select>
+     <!-- 4G产品状态激活 -->
+     <insert id="insertActiveAudit4G" parameterType="java.util.Map">
+		insert into dep_prod_activation_audit_4g
+		  (phone_number,
+		   province_id,
+		   lan_id,
+		   area_code,
+		   active_time,
+		   deal_type,
+		   deal_dt)
+		values
+		  (#{v_PHONENUMBER},
+		   #{v_PROVINCEID},
+		   #{v_LANID},
+		   #{v_AREACODE},
+		   to_date(#{v_ACTIVETIME}, 'yyyy-mm-dd hh24:mi:ss'),
+		   #{v_DEALTYPE},
+		   to_date(#{v_DEALDT}, 'yyyy-mm-dd'))		
+     </insert>
+     
+     <!-- 产品实例日稽核 -->
+     <insert id="insertDepProdDailyAudit" parameterType="java.util.Map">
+        insert into dep_prod_daily_audit_4g
+          (audit_dt,
+           phone_number,
+           ext_prod_inst_id,
+           province_id,
+           lan_id,
+           status_cd,
+           iccid,
+           c_imsi,
+           g_imsi,
+           l_imsi,
+           acc_product_id,
+           acc_product_name,
+           begin_rent_time,
+           finish_time,
+           stop_rent_time,
+           <if test="v_EXT_PROD_INST_SERV_ID != null and v_EXT_PROD_INST_SERV_ID != ''">ext_prod_inst_serv_id,</if>
+           transaction_id)
+		values
+		  (#{v_AUDIT_DT},
+           #{v_PHONE_NUMBER},
+           #{v_EXT_PROD_INST_ID},
+           #{v_PROVINCEID},
+           #{v_LANID},
+           #{v_STATUS_CD},
+           #{v_ICCID},
+           #{v_CIMSI},
+           #{v_GIMSI},
+           #{v_LIMSI},
+           #{v_ACC_PRODUCT_ID},
+           #{v_ACC_PRODUCT_NAME},
+           regexp_replace(#{v_BEGIN_RENT_TIME},'-|:|\s*',''),
+           regexp_replace(#{v_FINISH_TIME},'-|:|\s*',''),
+           regexp_replace(#{v_STOP_RENT_TIME},'-|:|\s*',''),
+           <if test="v_EXT_PROD_INST_SERV_ID != null and v_EXT_PROD_INST_SERV_ID != ''">#{v_EXT_PROD_INST_SERV_ID},</if>
+           #{transactionID})
+     </insert>
+     
+     <!-- 产品实例月稽核 -->
+     <insert id="insertDepProdMonthAudit" parameterType="java.util.Map">
+        insert into dep_prod_monthly_audit_4g
+          (phone_number,
+           ext_prod_inst_id,
+           province_id,
+           lan_id,
+           status_cd,
+           iccid,
+           c_imsi,
+           g_imsi,
+           l_imsi,
+           acc_product_id,
+           acc_product_name,
+           begin_rent_time,
+           finish_time,
+           stop_rent_time,
+           deal_time,
+           <if test="v_EXT_PROD_INST_SERV_ID != null and v_EXT_PROD_INST_SERV_ID != ''">ext_prod_inst_serv_id,</if>
+           transaction_id)
+		values(#{v_PHONE_NUMBER},
+           #{v_EXT_PROD_INST_ID},
+           #{v_PROVINCEID},
+           #{v_LANID},
+           #{v_STATUS_CD},
+           #{v_ICCID},
+           #{v_CIMSI},
+           #{v_GIMSI},
+           #{v_LIMSI},
+           #{v_ACC_PRODUCT_ID},
+           #{v_ACC_PRODUCT_NAME},
+           regexp_replace(#{v_BEGIN_RENT_TIME},'-|:|\s*',''),
+           regexp_replace(#{v_FINISH_TIME},'-|:|\s*',''),
+           regexp_replace(#{v_STOP_RENT_TIME},'-|:|\s*',''),
+           to_date(#{v_DEAL_TIME},'YYYY/MM/DD HH24:MI:SS'),
+           <if test="v_EXT_PROD_INST_SERV_ID != null and v_EXT_PROD_INST_SERV_ID != ''">#{v_EXT_PROD_INST_SERV_ID},</if>
+           #{transactionID})
+     </insert>
+     
+     <!-- 4G产销品稽核 -->
+     <select id="queryProdDailyAudit" parameterType="java.util.Map" resultType="java.lang.String">
+		select transaction_id
+		  from dep_prod_daily_audit_4g pda
+		 where pda.audit_dt = #{v_AUDIT_DT}
+		   and pda.phone_number = #{v_PHONE_NUMBER}
+		   and pda.ext_prod_inst_id = #{v_EXT_PROD_INST_ID}
+     </select>
+     
+     <!-- 4G产销品稽核 -->
+     <select id="queryProdMonthAudit" parameterType="java.util.Map" resultType="java.lang.String">
+		select transaction_id
+		  from dep_prod_monthly_audit_4g pma
+		 where pma.phone_number = #{v_PHONE_NUMBER}
+		   and pma.ext_prod_inst_id = #{v_EXT_PROD_INST_ID}            
+     </select>
+     
+     <!-- 4G产销品稽核 -->
+     <update id = "updateProdDailyAudit" parameterType="java.util.Map">
+		update dep_prod_daily_audit_4g pda
+		   set <if test="v_ICCID != null and v_ICCID != ''">pda.iccid = #{v_ICCID},</if>
+			   <if test="v_CIMSI != null and v_CIMSI != ''">pda.c_imsi = #{v_CIMSI},</if>
+			   <if test="v_GIMSI != null and v_GIMSI != ''">pda.g_imsi = #{v_GIMSI},</if>
+			   <if test="v_LIMSI != null and v_LIMSI != ''">pda.l_imsi = #{v_LIMSI},</if>
+			   <if test="v_STATUS_CD != null and v_STATUS_CD != ''">pda.status_cd = #{v_STATUS_CD},</if>
+			   <if test="v_STOP_RENT_TIME != null and v_STOP_RENT_TIME != ''">pda.stop_rent_time = regexp_replace(#{v_STOP_RENT_TIME},'-|:|\s*',''),</if>
+			   <if test="v_BEGIN_RENT_TIME != null and v_BEGIN_RENT_TIME != ''">pda.begin_rent_time = regexp_replace(#{v_BEGIN_RENT_TIME},'-|:|\s*',''),</if>
+			   <if test="v_EXT_PROD_INST_SERV_ID != null and v_EXT_PROD_INST_SERV_ID != ''">pda.ext_prod_inst_serv_id = #{v_EXT_PROD_INST_SERV_ID},</if>
+               pda.phone_number = #{v_PHONE_NUMBER},
+               pda.TRANSACTION_ID = #{transactionId}
+		 where pda.audit_dt = #{v_AUDIT_DT}
+           and pda.phone_number = #{v_PHONE_NUMBER}
+           and pda.ext_prod_inst_id = #{v_EXT_PROD_INST_ID}
+     </update>
+     
+     <!-- 4G产销品稽核 -->
+      <select id="queryAccProductName" parameterType="java.util.Map" resultType="java.util.Map">
+		select c.p_code prod_spec_id,c.description acc_product_name
+          from code_mapping c
+         where c.h_code = #{v_ACC_PRODUCT_ID}
+           and c.map_domain = 'PRODUCT.EXT_PRODUCT_NBR.ACCS'
+           and c.status_cd='0'
+           and rownum = 1
+     </select>      
+     
+     <!-- 4G产销品稽核 -->
+     <select id="getProdResInfo" parameterType="java.util.Map" resultType="java.util.Map">
+		select pma.iccid iccid, pma.c_imsi cimsi, pma.g_imsi gimsi, pma.l_imsi limsi
+          from dep_prod_monthly_audit_4g pma
+         where pma.phone_number = #{v_PHONE_NUMBER}
+           and pma.ext_prod_inst_id = #{v_EXT_PROD_INST_ID} 
+     </select>
+     
+     <!-- 4G产销品稽核 -->
+      <insert id="insertDepOfferDailyAudit" parameterType="java.util.Map">
+		insert into dep_offer_daily_audit_4g
+		  (audit_dt,
+		   ext_prod_offer_inst_id,
+		   province_id,
+		   lan_id,
+		   cust_id,
+		   offer_inst_status_cd,
+		   ext_prod_offer_id,
+		   prod_offer_name,
+		   eff_date,
+		   exp_date,
+		   deal_flag,
+           transaction_id)
+		values
+		  (#{v_AUDIT_DT},
+		   #{v_EXT_OFFER_INST_ID},
+		   #{v_PROVINCEID},
+		   #{v_OFFER_INST_LAN_ID},
+		   #{v_CUST_ID},
+		   #{v_OFFER_INST_STATUS_CD},
+		   #{v_EXT_PROD_OFFER_ID},
+		   #{v_PROD_OFFER_NAME},
+		   #{v_EFF_DATE},
+		   #{v_EXP_DATE},
+		   #{v_DEAL_FLAG},
+           #{transactionID}
+		   )
+      </insert>
+      
+      <!-- 4G产销品稽核 -->
+      <insert id="insertDepOfferMonthAudit" parameterType="java.util.Map">
+		insert into dep_offer_monthly_audit_4g
+          (ext_prod_offer_inst_id,
+          province_id,
+          lan_id,
+          cust_id,
+          offer_inst_status_cd,
+          ext_prod_offer_id,
+          prod_offer_name,
+          eff_date,
+          exp_date,
+          deal_time,
+          transaction_id)
+        values
+          (#{v_EXT_OFFER_INST_ID},
+           #{v_PROVINCEID},
+           #{v_OFFER_INST_LAN_ID},
+           #{v_CUST_ID},
+           #{v_OFFER_INST_STATUS_CD},
+           #{v_EXT_PROD_OFFER_ID},
+           #{v_PROD_OFFER_NAME},
+           #{v_EFF_DATE},
+           #{v_EXP_DATE},
+           to_date(#{v_DEAL_TIME},'YYYY/MM/DD HH24:MI:SS'),
+           #{transactionID})
+      </insert>        
+      
+      <!-- 4G产销品稽核 -->
+      <select id="queryDepOfferMonthAudit4G" parameterType="java.util.Map" resultType="java.lang.String">
+		select transaction_id
+          from dep_offer_monthly_audit_4g oma
+         where oma.ext_prod_offer_inst_id=#{v_EXT_OFFER_INST_ID}
+      </select>
+      
+      <!-- 4G产销品稽核 -->
+      <select id="queryDepOfferDailyAudit4G" parameterType="java.util.Map" resultType="java.lang.String">
+		select transaction_id
+          from dep_offer_daily_audit_4g t
+         where t.ext_prod_offer_inst_id=#{v_EXT_OFFER_INST_ID}
+           and t.audit_dt = #{v_AUDIT_DT}
+      </select>
+      
+      <!-- 4G产销品稽核 -->
+      <update id = "updateProdMonthAudit" parameterType="java.util.Map">
+		update dep_prod_monthly_audit_4g pma
+           set <if test="v_ICCID != null and v_ICCID != ''">pma.iccid = #{v_ICCID},</if>
+			   <if test="v_CIMSI != null and v_CIMSI != ''">pma.c_imsi = #{v_CIMSI},</if>
+			   <if test="v_GIMSI != null and v_GIMSI != ''">pma.g_imsi = #{v_GIMSI},</if>
+			   <if test="v_LIMSI != null and v_LIMSI != ''">pma.l_imsi = #{v_LIMSI},</if>
+			   <if test="v_LANDID != null and v_LANDID != ''">pma.lan_id = #{v_LANDID},</if>
+			   <if test="v_STATUS_CD != null and v_STATUS_CD != ''">pma.status_cd = #{v_STATUS_CD},</if>
+			   <if test="v_STOP_RENT_TIME != null and v_STOP_RENT_TIME != ''">pma.stop_rent_time = regexp_replace(#{v_STOP_RENT_TIME},'-|:|\s*',''),</if>
+			   <if test="v_BEGIN_RENT_TIME != null and v_BEGIN_RENT_TIME != ''">pma.begin_rent_time = regexp_replace(#{v_BEGIN_RENT_TIME},'-|:|\s*',''),</if>
+			   <if test="v_FINISH_TIME != null and v_FINISH_TIME != ''">pma.finish_time = regexp_replace(#{v_FINISH_TIME},'-|:|\s*',''),</if>
+			   <if test="v_EXT_PROD_INST_SERV_ID != null and v_EXT_PROD_INST_SERV_ID != ''">pma.ext_prod_inst_serv_id = #{v_EXT_PROD_INST_SERV_ID},</if>
+			    pma.deal_time = to_date(#{v_DEAL_TIME},'YYYY/MM/DD HH24:MI:SS'),
+                pma.version = sysdate,
+                pma.TRANSACTION_ID = #{transactionId}
+          where pma.phone_number = #{v_PHONE_NUMBER}
+          	<if test="v_EXT_PROD_INST_ID != null and v_EXT_PROD_INST_ID != ''">and pma.ext_prod_inst_id = #{v_EXT_PROD_INST_ID}</if>
+     </update>
+     
+     <!-- 新增EXT_PROD_INST_VOLTE_ID -->
+     <update id="updateProdMonVotel" parameterType="java.util.Map">
+     	update dep_prod_monthly_audit_4g pma set pma.EXT_PROD_INST_VOLTE_ID = #{extProdInstId} where pma.EXT_PROD_INST_ID = #{extAccProdInstId}
+     </update>
+     
+     <!-- 4G产销品稽核 -->
+     <update id = "updateDepOfferDailyAudit" parameterType="java.util.Map">
+		update dep_offer_daily_audit_4g oda
+           set oda.offer_inst_status_cd = #{v_OFFER_INST_STATUS_CD},
+               oda.exp_date = #{v_EXP_DATE},
+               oda.TRANSACTION_ID = #{transactionID}
+         where oda.audit_dt = #{v_AUDIT_DT}
+           and oda.ext_prod_offer_inst_id = #{v_EXT_OFFER_INST_ID}
+     </update>
+     
+     <!-- 4G产销品稽核 -->
+     <update id = "updateDepOfferMonthAudit" parameterType="java.util.Map">
+		update dep_offer_monthly_audit_4g oma
+           set oma.offer_inst_status_cd = #{v_OFFER_INST_STATUS_CD},
+               oma.exp_date = #{v_EXP_DATE},
+               oma.version = sysdate,
+               oma.TRANSACTION_ID = #{transactionID},
+               oma.deal_time = to_date(#{v_DEAL_TIME},'YYYY/MM/DD HH24:MI:SS')
+         where oma.ext_prod_offer_inst_id = #{v_EXT_OFFER_INST_ID}
+     </update>
+     
+     <!-- 4G产销品稽核 -->
+     <select id="queryEffDateByExtOfferInstId" parameterType="java.lang.String" resultType="java.util.Map">
+     	select oma.eff_date effDate,oma.exp_date expDate
+          from dep_offer_monthly_audit_4g oma
+         where oma.ext_prod_offer_inst_id = #{extOfferInstId}
+     </select>
+     
+     <!-- 4G产销品稽核 -->
+     <select id="queryBeginRentTime" parameterType="java.util.Map" resultType="java.util.Map">
+     	select pma.begin_rent_time beginRentTime, pma.finish_time finishTime
+          from dep_prod_monthly_audit_4g pma
+         where pma.phone_number = #{phoneNumber}
+           and pma.ext_prod_inst_id = #{extProdInstId}
+     </select>
+     
+     <!-- 3G订单费用稽核   订单费用稽核表记录数 -->
+     <select id="queryOrderChargeCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+            SELECT count(1)
+              FROM dep_order_charge_audit
+             WHERE order_id = #{orderId}
+               AND group_id = #{groupId}
+               AND acct_type = #{acctType}
+     </select>
+     
+     <!-- 3G订单费用稽核  -->
+     <insert id="insertOrderCharge" parameterType="java.util.Map" >
+            INSERT INTO dep_order_charge_audit
+                    (ORDER_ID,
+                     GROUP_ID,
+                     ACCT_TYPE,
+                     AMOUNT,
+                     PROVINCE_ID,
+                     LAN_ID,
+                     deal_type,
+                     deal_dt)
+                  values
+                    (#{orderId},
+                     #{groupId},
+                     #{acctType},
+                     #{amount},
+                     #{provinceId},
+                     #{lanId},
+                     #{dealType},
+                     to_date(#{dealDt}, 'YYYY-MM-DD HH24:MI:SS'))
+     </insert>
+     
+     <!-- 3G订单费用稽核  费用查询-->
+ 	 <select id="queryOrderChargeAmount" parameterType="java.util.Map" resultType="java.lang.String">
+            SELECT AMOUNT
+                FROM dep_order_charge_audit
+             WHERE order_id = #{orderId}
+               AND group_id = #{groupId}
+               AND acct_type = #{acctType}
+     </select>
+     
+     <!-- 3G订单费用稽核  更新费用-->
+     <update id="updateOrderChargeAudit" parameterType="java.util.Map">
+             update dep_order_charge_audit
+             set AMOUNT = #{amount}
+		     WHERE order_id = #{orderId}
+		     AND group_id = #{groupId}
+		     AND acct_type = #{acctType}
+    </update>
+    <!-- 3G订单信息稽核查询是否存在-->
+ 	 <select id="queryOrderInfoAudit" parameterType="java.util.Map" resultType="java.lang.Integer">
+            SELECT count(1)
+                FROM dep_order_info_audit
+             WHERE order_id = #{orderId}
+               AND group_id = #{groupId}
+     </select>
+     <!-- 3G订单信息稽核新增 -->
+    <insert id="insertOrderInfoAudit" parameterType="java.util.Map" >
+            INSERT INTO dep_order_info_audit
+                (
+                <if test="v_ORDERID != null and v_ORDERID != ''">ORDER_ID,</if>
+                <if test="v_GROUPID != null and v_GROUPID != ''">GROUP_ID,</if>
+                <if test="v_CHANNEL != null and v_CHANNEL != ''">CHANNEL,</if>
+                <if test="v_PROVINCEID != null and v_PROVINCEID != ''">PROVINCE_ID,</if>
+                <if test="v_LANID != null and v_LANID != ''">LAN_ID,</if>
+                <if test="v_ACCNBR != null and v_ACCNBR != ''">ACC_NBR,</if>
+                <if test="v_IMSI != null and v_IMSI != ''">IMSI,</if>
+                <if test="v_GIMSI != null and v_GIMSI != ''">GIMSI,</if>
+                <if test="v_MKTNBR != null and v_MKTNBR != ''">MKT_NBR,</if>
+                <if test="v_MKTID != null and v_MKTID != ''">MKT_ID,</if>
+                <if test="v_DEALTYPE != null and v_DEALTYPE != ''">DEAL_TYPE,</if>
+                 deal_dt)
+              values
+                (
+                <if test="v_ORDERID != null and v_ORDERID != ''">#{v_ORDERID},</if>
+                <if test="v_GROUPID != null and v_GROUPID != ''">#{v_GROUPID},</if>
+                <if test="v_CHANNEL != null and v_CHANNEL != ''">#{v_CHANNEL},</if>
+                <if test="v_PROVINCEID != null and v_PROVINCEID != ''">#{v_PROVINCEID},</if>
+                <if test="v_LANID != null and v_LANID != ''">#{v_LANID},</if>
+                <if test="v_ACCNBR != null and v_ACCNBR != ''">#{v_ACCNBR},</if>
+                <if test="v_IMSI != null and v_IMSI != ''">#{v_IMSI},</if>
+                <if test="v_GIMSI != null and v_GIMSI != ''">#{v_GIMSI},</if>
+                <if test="v_MKTNBR != null and v_MKTNBR != ''">#{v_MKTNBR},</if>
+                <if test="v_MKTID != null and v_MKTID != ''">#{v_MKTID},</if>
+                <if test="v_DEALTYPE != null and v_DEALTYPE != ''">#{v_DEALTYPE},</if>
+                 to_date(#{v_DEALDT}, 'YYYY-MM-DD HH24:MI:SS'))
+     </insert>
+     
+     <!-- 3G产品状态激活稽核 -->
+     <insert id="insertActiveAudit" parameterType="java.util.Map">
+             INSERT INTO dep_prod_activation_audit
+              (phone_number,
+               province_id,
+               lan_id,
+               area_code,
+               active_time,
+               deal_type,
+               deal_dt)
+            values
+              (#{v_PHONENUMBER},
+               #{v_PROVINCEID},
+               #{v_LANID},
+               #{v_AREACODE},
+               to_date(#{v_ACTIVETIME},'YYYY-MM-DD HH24:MI:SS'),
+               #{v_DEALTYPE},
+               to_date(#{v_DEALDT}, 'YYYY-MM-DD HH24:MI:SS'))
+      </insert>
+      
+      <!-- 集团电渠订单给计费的信息稽核-->
+     <select id="queryCntD2bOrderOffer" parameterType="java.lang.String" resultType="java.lang.Integer">
+                         select count(1) 
+                      from d2b_order_offer_info
+                     where deal_type = 'R'
+                       and ol_id = #{olId}
+                       and rownum = 1
+     </select>
+     
+      <!-- 集团电渠订单给计费的信息稽核 -->
+     <insert id="insertD2bOrderOffer" parameterType="java.util.Map">
+          INSERT INTO d2b_order_offer_info
+		      (area_code,
+		       ol_id,
+		       offer_nbr,
+		       service_offer_id,
+		       deal_type,
+		       deal_dt,
+		       ext_cust_order_id)
+		  VALUES
+		      (#{AREA_CODE},
+		       #{OL_ID},
+		       #{OFFER_NBR},
+		       #{SERVICE_OFFER_ID},
+		       'W',
+		       sysdate,
+		       #{EXT_CUST_ORDER_ID})
+     </insert>
+     
+      <!-- 集团电渠订单给计费的信息稽核 -->
+     <select id="queryOfferNbr" parameterType="java.lang.String" resultType="java.lang.String">
+                 SELECT DP2.H_CODE 
+              FROM DEP_PRVNC_CODE_MAPPING DP1, DEP_PRVNC_CODE_MAPPING DP2
+             WHERE DP2.P_CODE = DP1.P_CODE
+               AND DP2.MAP_DOMAIN = 'PROD_OFFER.OFFER_NBR'
+               AND DP1.MAP_DOMAIN = 'PROD_OFFER.EXT_OFFER_NBR'
+               AND DP1.H_CODE = #{offerNbr}
+               AND ROWNUM = 1
+     </select>
+     
+     <!-- 云卡日稽核 -->
+     <insert id="insertDepCloudDayAudit"  parameterType="java.util.Map">
+        insert into dep_cloudcard_day_audit
+              (phone_number,
+               province_id,
+               lan_id,
+               active_time,
+               deal_type,
+               deal_dt)
+         values
+              (#{phoneNumber},
+               #{provinceId},
+               #{lanId},
+               TO_DATE(#{activeTime},'YYYYMMDDHH24MISS'),
+               'W',
+               #{dealDt})
+     </insert>
+     
+     <!-- 云卡日稽核 -->
+     <select id="queryCntCloudcardDay" parameterType="java.lang.String" resultType="java.lang.String">
+        select a.transaction_id
+              from dep_cloudcard_day_audit a
+             where a.phone_number = #{phoneNumber}
+                   a.deal_dt      = #{dealDt}
+     </select>
+     
+     <!-- 云卡日稽核 -->
+     <update id="updateCloudcardDay" parameterType="java.util.Map">
+       update dep_cloudcard_day_audit a
+                 set a.active_time = to_date(#{activeTime},'YYYYMMDDHH24MISS')
+               where a.phone_number = #{phoneNumber}
+                     a.deal_dt      = #{dealDt}
+     </update>
+     
+     <!-- 云卡月稽核 -->
+     <select id="queryCntCloudcardMonth" parameterType="java.lang.String" resultType="java.lang.String">
+        select a.transaction_id
+              from dep_cloudcard_month_audit a
+             where a.phone_number = #{phoneNumber}
+     </select>
+     
+     <!-- 云卡月稽核 -->
+     <update id="updateCloudcardMonth" parameterType="java.util.Map">
+       update dep_cloudcard_month_audit a
+                 set a.active_time = to_date(#{activeTime},'YYYYMMDDHH24MISS')
+               where a.phone_number = #{phoneNumber}
+     </update>
+     
+     <!-- 云卡月稽核 -->
+     <insert id="insertDepCloudMonthAudit" parameterType="java.util.Map">
+         insert into dep_cloudcard_month_audit
+                (phone_number,
+                 province_id,
+                 lan_id,
+                 active_time,
+                 deal_type,
+                 deal_dt)
+              values
+                (#{phoneNumber},
+                 #{provinceId},
+                 #{lanId},
+                 TO_DATE(#{activeTime},'YYYYMMDDHH24MISS'),
+                 'W',
+                 #{dealDt})
+     </insert>
+     
+     <!-- c网稽核新增 -->
+	<insert id="saveCProdAudit" parameterType="java.util.Map">
+		insert into CEP_PROD_C
+		values
+		  (#{mdn},
+		   #{imsi},
+		   #{state},
+		   #{provinceCode},
+		   to_char(sysdate,'yyyy-MM-dd HH:mm:ss'),
+		   to_char(sysdate,'yyyy-MM-dd HH:mm:ss'),
+		   #{payType},
+		   #{cityCode},
+		   #{lteimsi,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- c网稽核删除 -->
+	<delete id="delCProdAudit" parameterType="java.util.Map">
+		delete from CEP_PROD_C t where t.mdn = #{mdn} or t.imsi = #{imsi}
+	</delete>
+	
+	<!-- c网稽核更新 -->
+	<update id="updateCProdAudit" parameterType="java.util.Map">
+		update CEP_PROD_C t
+		   set t.imsi         = #{imsi},
+		       t.state        = #{state},
+		       t.provincecode = #{provinceCode},
+		       t.updatetime   = to_char(sysdate,'yyyy-MM-dd HH:mm:ss'),
+		       t.paytype      = #{payType},
+		       t.lanid        = #{cityCode},
+		       t.lteimsi      = #{lteimsi,jdbcType=VARCHAR}
+		 where t.mdn = #{mdn}
+	</update>
+	
+    <!-- c网稽核查询 -->
+    <select id="queryCProdAudit" parameterType="java.util.Map" resultType="java.lang.Integer">
+    	select count(1) from CEP_PROD_C t where t.mdn = #{mdn} or t.imsi = #{imsi}
+    </select>
+     
+     <!-- 国漫新增 -->
+     <insert id = "insertIntalRoamAudit" parameterType="java.util.Map">
+          insert into cep_to_gc_chk_init
+								  (MDN,
+								   <if test="cimsi != null and cimsi != ''">C_IMSI,</if>
+								   <if test="gimsi != null and gimsi != ''">G_IMSI,</if>
+								   <if test="uimid != null and uimid != ''">UIMID,</if>
+								   <if test="ki != null and ki != ''">KI,</if>
+								   <if test="roam != null and roam != ''">ROAM,</if>
+								   <if test="gprsCtnet != null and gprsCtnet != ''">GPRS_CTNET,GPRS_CTWAP,GPRS_CTBB,</if>
+								   REGION,
+								   VERSION,
+								   TRANSACTION_ID)
+								   values(
+								   #{mdn},
+								   <if test="cimsi != null and cimsi != ''">#{cimsi},</if>
+								   <if test="gimsi != null and gimsi != ''">#{gimsi},</if>
+								   <if test="uimid != null and uimid != ''">#{uimid},</if>
+								   <if test="ki != null and ki != ''">#{ki},</if>
+								   <if test="roam != null and roam != ''">#{roam},</if>
+								   <if test="gprsCtnet != null and gprsCtnet != ''">#{gprsCtnet},#{gprsCtnet},#{gprsCtnet},</if>
+								   #{region},
+								   to_date(#{version}, 'YYYY-MM-DD HH24:MI:SS'),
+								   #{transactionId}
+								   )
+     </insert>
+     <!-- 国漫删除 -->
+     <delete id = "delIntalRoamAudit" parameterType="java.util.Map">
+     	    delete from cep_to_gc_chk_init t where t.mdn = #{mdn}
+     </delete>
+     <!-- 国漫查询 -->
+     <select id="queryIntalRoamAudit" parameterType="java.util.Map" resultType="java.lang.String">
+     		select t.transaction_id from cep_to_gc_chk_init t where t.mdn = #{mdn}
+     </select>
+     <!-- 国漫更新 -->
+     <update id = "updateIntalRoamAudit" parameterType="java.util.Map">
+            update cep_to_gc_chk_init
+				   set 
+				       <if test="cimsi != null and cimsi != ''">C_IMSI=#{cimsi},</if>
+					   <if test="gimsi != null and gimsi != ''">G_IMSI=#{gimsi},</if>
+					   <if test="uimid != null and uimid != ''">UIMID=#{uimid},</if>
+					   <if test="ki != null and ki != ''">KI=#{ki},</if>
+					   <if test="roam != null and roam != ''">ROAM=#{roam},</if>
+					   <if test="gprsCtnet != null and gprsCtnet != ''">GPRS_CTNET=#{gprsCtnet},GPRS_CTWAP=#{gprsCtnet},GPRS_CTBB=#{gprsCtnet},</if>
+				       REGION = #{region},
+				       VERSION = to_date(#{version}, 'YYYY-MM-DD HH24:MI:SS'),
+				       TRANSACTION_ID = #{transactionId}
+				 where MDN = #{mdn}
+     </update>
+     
+     <!-- 协同通信 -->
+     <insert id = "saveXttxAudit" parameterType="java.util.Map">
+     insert into cep_to_xttx_chk_loc
+		(
+		  BSS_PROD_ID,
+		  BSS_PROD_SPEC_ID,
+		  AREALEVEL3_AREAID,
+		  BUS_NO,
+		  LOGIN_NO,
+		  STATE,
+		  USER_TYPE,
+		  TEL,
+		  CELL_PHONE,
+		  E_ID,
+		  E_NAME,
+		  OPEN_DATE,
+		  UPDATE_DATE,
+		  REGION)values(#{prodId},'20',#{prodSpecId},#{busNo},#{loginNo},#{state},#{userType},#{tel},#{cellPhone},#{eId},#{eName},#{openDate},#{updateDate}，#{areaCode})
+     </insert>
+     <!-- 协同通信 -->
+     <delete id = "delXttxAudit" parameterType="java.util.Map">
+     	    delete from cep_to_xttx_chk_loc t where t.BSS_PROD_ID = #{prodId} and t.E_ID = #{eId}
+     </delete>
+     
+     <!-- 执行动态SQL -->
+    <select id="getValue" parameterType="java.util.HashMap" resultType="string">
+	    ${SQL}
+	</select>
+	
+	<!-- 编码映射 -->
+	<select id="queryCodeMapping" parameterType="java.lang.String" resultType="java.util.Map">
+       SELECT H_CODE,P_CODE,DESCRIPTION FROM CODE_MAPPING R WHERE R.MAP_DOMAIN = #{domain}
+    </select>
+	
+    <!-- 一点收费增量稽核 -->
+    <insert id="saveYdsfIncrAudit" parameterType="java.util.Map">
+         insert into DEP_P_CHARGE_INCRE_AUDIT
+            (ID,
+             PROVINCECODE,
+             CITYCODE,
+             TRANSACTIONID,
+             CONBR,
+             ORDERNBR,
+             PRODUCTNBR,
+             SERVID,
+             PRODCODE,
+             STATUSDATETIME,
+             PRICEPLANSTARTDATE,
+             PAYPOINTTYPE,
+             CURRENTACTIVITY,
+             STATE,
+             STATEDESC,
+             DEALFLAG,
+             REMARK,
+             CREATEDT,
+             VERSION,
+             updateWholePPSD)
+          values
+            (#{YDSF_ID},
+             #{V_PROVINCECODE},
+             #{V_CITYCODE},
+             #{V_TRANSACTIONID},
+             #{V_CONBR},
+             #{V_ORDER_ITEM_GROUP_ID},
+             #{V_PRODUCTNBR},
+             #{V_SERVID},
+             #{V_PRODCODE},
+             to_date(#{V_STATUSDATETIME},'yyyymmddhh24miss'),
+             to_date(#{V_PRICEPLANSTARTDATE},'yyyymmddhh24miss'),
+             #{V_PAYPOINTTYPE},
+             '',
+             '',
+             '',
+             'C',
+             '',
+             SYSDATE,
+             SYSDATE,
+             to_date(#{V_UPDATEWHOLEPPSD},'yyyymmddhh24miss'))
+    </insert>
+    <!-- 一点收费全量稽核 -->
+    <insert id="saveYdsfWholeAudit" parameterType="java.util.Map">
+         insert into dep_p_charge_whole_audit
+            (
+             PROVINCECODE,
+             CONBR,
+             TRANSACTIONID,
+             CUSTORDERTYPE,
+             CITYCODE,
+             SHORTNBR,
+             PRODUCTNBR,
+             SERVID,
+            <if test="V_ACCID != null and V_ACCID != ''">
+                ACCID,
+             </if>
+             CUSTID,
+             PRICEPLANCODE,
+             PRODCODE,
+             PAYPOINTTYPE,
+             CNETLIMIT,
+             STATUSDATETIME,
+             PRICEPLANSTARTDATE,
+             CHARGESTATE,
+             CREATEDT,
+             VERSION,
+             ACCTITEMID)
+          VALUES
+            (
+             #{V_PROVINCECODE},
+             #{V_CONBR},
+             #{V_TRANSACTIONID},
+             '',
+             #{V_CITYCODE},
+             '',
+             #{V_PRODUCTNBR},
+             #{V_SERVID},
+             <if test="V_ACCID != null and V_ACCID != ''">
+             #{V_ACCID},
+             </if>
+             #{V_CUSTID},
+             #{V_PRICEPLANCODE},
+             #{V_PRODCODE},
+             #{V_PAYPOINTTYPE},
+             #{V_CNETLIMIT},
+             to_date(#{V_STATUSDATETIME},'yyyymmddhh24miss'),
+              to_date(#{V_UPDATEWHOLEPPSD},'yyyymmddhh24miss'),
+             #{V_CHARGESTATE},
+             SYSDATE,
+             SYSDATE,
+             #{V_ACCT_ITEM_TYPE_GROUP_ID})
+    </insert>
+    <!-- 一点收费 -->
+    <insert id="saveYdsfChargeIncrItem" parameterType="java.util.Map">
+            insert into dep_p_charge_incre_item_audit
+            (ID,
+             ITEMACTION,
+             ITEMID,
+             ITEMNAME,
+             <if test="V_ITEMVALUE != null and  V_ITEMVALUE != '' ">
+             ITEMVALUE,
+             </if>
+             VALUENAME,
+             <if test="V_OLDVALUE != null and  V_OLDVALUE != '' ">
+             OLDVALUE,
+             </if>
+             OLDVALUENAME,
+             CREATEDT)
+          values
+            (#{YDSF_ID},
+             #{V_ITEMACTION},
+             #{V_ITEMID},
+             #{V_ITEMNAME},
+             <if test="V_ITEMVALUE != null and  V_ITEMVALUE != '' ">
+             #{V_ITEMVALUE},
+             </if>
+             '',
+             <if test="V_OLDVALUE != null and  V_OLDVALUE != '' ">
+             #{V_OLDVALUE},
+             </if>
+             '',
+             SYSDATE)
+    </insert>
+	<!-- 一点收费 -->
+    <update id="updateYdsfWholeAudit" parameterType="java.util.Map">
+         UPDATE DEP_P_CHARGE_WHOLE_AUDIT
+             SET CONBR              = #{V_CONBR},
+                 TRANSACTIONID      = #{V_TRANSACTIONID},
+                 SERVID             = #{V_SERVID},
+                 PRODCODE           = #{V_PRODCODE},
+                 PAYPOINTTYPE       = #{V_PAYPOINTTYPE},
+                 PRICEPLANSTARTDATE = to_date(#{V_UPDATEWHOLEPPSD},'yyyymmddhh24miss'),
+                 STATUSDATETIME     = to_date(#{V_STATUSDATETIME},'yyyymmddhh24miss'),
+          <if test="V_CHARGESTATE != null and V_CHARGESTATE !='' ">       
+                 CHARGESTATE        = #{V_CHARGESTATE},
+          </if>   
+          <if test="V_CUSTID != null and  V_CUSTID != '' ">       
+                 CUSTID             = #{V_CUSTID},
+          </if>      
+          <if test="V_ACCID != null and  V_ACCID != '' ">       
+                 ACCID             = #{V_ACCID},
+          </if> 
+          <if test="V_CNETLIMIT != null and  V_CNETLIMIT != '' ">       
+                 CNETLIMIT             = #{V_CNETLIMIT},
+          </if>            
+                  VERSION            = sysdate
+           WHERE a.citycode = #{V_CITYCODE}
+             and a.productnbr = #{V_PRODUCTNBR}
+    </update>
+    <!-- 一点收费 -->
+    <select id="queryWholeYdsfByNbr" parameterType="java.util.Map" resultType="java.util.Map">
+       select 
+                 PROVINCECODE VV_PROVINCECODE,
+                 CONBR VV_CONBR,
+                 TRANSACTIONID VV_TRANSACTIONID,
+                 CUSTORDERTYPE VV_CUSTORDERTYPE,
+                 CITYCODE VV_CITYCODE,
+                 SHORTNBR VV_SHORTNBR,
+                 PRODUCTNBR VV_PRODUCTNBR,
+                 SERVID VV_SERVID,
+                 ACCID VV_ACCID,
+                 CUSTID VV_CUSTID,
+                 PRICEPLANCODE VV_PRICEPLANCODE,
+                 PRODCODE VV_PRODCODE,
+                 PAYPOINTTYPE VV_PAYPOINTTYPE,
+                 CNETLIMIT VV_CNETLIMIT,
+                 to_char(STATUSDATETIME,'YYYYMMDDHH24MISS') VV_STATUSDATETIME,
+                 TO_CHAR(PRICEPLANSTARTDATE,'YYYYMMDDHH24MISS') VV_PRICEPLANSTARTDATE,
+                 CHARGESTATE,
+                 TO_CHAR(CREATEDT,'YYYYMMDDHH24MISS') VV_CREATEDT,
+                 TO_CHAR(VERSION,'YYYYMMDDHH24MISS') VV_VERSION
+            from dep_p_charge_whole_audit a
+           where a.citycode = #{V_CITYCODE}
+             and a.productnbr = #{V_PRODUCTNBR}
+             and rownum = 1
+    </select>
+    
+    <!-- 带宽型相关 -->
+    <insert id="saveDdnAuditDataAdd" parameterType="java.util.HashMap">
+	    insert into DDN_AUDIT_DATA_ADD
+	    (PROVINCECODE,
+	     PRODUCT_NBR,
+	     PROD_INST_ID,
+	     P_EXT_PROD_INST_ID,
+	     EXT_PROD_INST_ID,
+	     CUST_ID,
+	     ACC_NBR,
+	     BEGIN_RENT_TIME,
+	     STATUS_CD,
+	     lan_id)
+	    values
+	    ('600103',
+	     #{V_PRODUCTNBR},
+	     '',
+	     #{V_PROD_INST_ID},
+	     #{V_EXT_PROD_INST_ID},
+	     #{V_CUSTID},
+	     #{V_ACCNBR},
+	     to_date(#{V_BEGINRENTTIME},'yyyymmddhh24miss'),
+	     '100000',
+	     #{V_AREAID})
+    </insert>
+     <!-- 带宽型相关 -->
+    <update id="updateDdnAuditDataAdd" parameterType="java.util.Map">
+      update ddn_audit_data_add a
+                   set a.prod_inst_id =#{V_PRODINSTID}
+                   where a.ext_prod_inst_id = #{V_EXTPRODINSTID}
+    </update>
+    
+    <!-- 带宽型相关SQL -->
+    <select id="queryDdnAuditAdd" resultType="java.util.Map">
+       SELECT PRODUCT_NBR,PROD_INST_ID,P_EXT_PROD_INST_ID,EXT_PROD_INST_ID,LAN_ID FROM DDN_AUDIT_DATA_ADD WHERE EXT_PROD_INST_ID IN ('20040600001250181','20040600001250182')
+    </select>
+    
+    <!-- 带宽型相关SQL -->
+    <select id="queryProdIdByPExt" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT A.EXT_PROD_INST_ID,A.PROD_INST_ID
+                      FROM DDN_AUDIT_DATA_ADD A
+                      WHERE A.P_EXT_PROD_INST_ID = #{v_PEXTPRODINSTID}
+                        AND A.EXT_PROD_INST_ID != #{V_EXTPRODINSTID}
+    </select>
+    
+    <!-- 带宽型相关SQL -->
+    <delete id="deleteDdnAudit">
+         <![CDATA[DELETE DDN_AUDIT DA
+         WHERE TO_CHAR(DA.DEL_DT,'YYYYMM') <= TO_CHAR(ADD_MONTHS(TRUNC(SYSDATE),-2),'YYYYMM')]]>
+    </delete>
+    
+    <!-- 带宽型相关SQL -->
+    <delete id="deleteDdnAuditDataAdd" parameterType="java.lang.String">
+         DELETE DDN_AUDIT_DATA_ADD DA
+         WHERE 1=1
+        <if test="condition == '1'">
+         AND TO_CHAR(DA.DEL_DT,'YYYYMM')  &lt;= TO_CHAR(ADD_MONTHS(TRUNC(SYSDATE),-2),'YYYYMM')
+        </if>
+        <if test="condition == '2'">
+         AND DA.PROD_INST_ID IS NOT NULL
+        </if>
+    </delete>
+    
+    <!-- 带宽型相关SQL -->
+    <insert id="insertDdnAudit">
+         INSERT INTO DDN_AUDIT(
+                             PROVINCECODE,
+                             PRODUCT_NBR,
+                             PROD_INST_ID,
+                             EXT_PROD_INST_ID,
+                             CUST_ID,ACC_NBR,
+                             BEGIN_RENT_TIME,
+                             STATUS_CD,
+                             DEAL_TYPE,
+                             INSERT_DT,
+                             DEAL_DT,DEL_DT)
+                      SELECT DA.PROVINCECODE,
+                             DA.PRODUCT_NBR,
+                             DA.PROD_INST_ID,
+                             DA.EXT_PROD_INST_ID,
+                             DA.CUST_ID,
+                             DA.ACC_NBR,
+                             DA.BEGIN_RENT_TIME,
+                             DA.STATUS_CD,
+                             'W',
+                             SYSDATE,
+                             '',
+                             DA.DEL_DT
+            FROM DDN_AUDIT_DATA_ADD DA
+            WHERE DA.PROD_INST_ID IS NOT NULL
+    </insert>
+    
+    <!-- 终端补贴日增 -->
+    <insert id="insertCepAuditTerminalDay" parameterType="java.util.Map">
+		insert into cep_terminal_day_audit
+		values
+		  (
+		   #{auditDt},
+		   #{orderNo},
+		   #{actionTypeCd},
+		   #{specId},
+		   '',
+		   #{agentCode},
+		   #{provinceCode},
+		   #{salesDate},
+		   'W',
+		   sysdate)
+    </insert>
+    
+    <!-- 终端补贴串码信息定期上传 -->
+    <insert id="insertCepAuditTerminalAll" parameterType="java.util.Map">
+		insert into cep_terminal_all_audit
+		values
+		  (
+		   #{termKey},
+		   #{provinceCode},
+		   #{TermModel},
+		   #{Provider},
+		   #{inSource},
+		   #{nationalSharing},
+		   #{saleState},
+		   #{subState},
+		   'W',
+		   sysdate)
+    </insert>
+    
+    <!-- 政企查询 -->
+    <select id="queryInternetBusProdAudit" parameterType="java.lang.String" resultType="java.lang.String">
+    	select transaction_id from internet_business_prod_audit where ext_prod_inst_id = #{extProdInstId}
+    </select>
+    <!-- 政企稽核新装 -->
+    <insert id="saveInternetBusProdAudit" parameterType="java.util.Map">
+		INSERT INTO INTERNET_BUSINESS_PROD_AUDIT
+		  (PROVINCE_CODE,
+		   PRODUCT_NBR,
+		   EXT_PROD_INST_ID,
+		   EXT_CUST_ID,
+		   ACC_NBR,
+		   STATUS_CD,
+		   STATUS_DT,
+		   DEAL_TIME,
+		   REMARK,
+		   transaction_id)
+		VALUES
+		  (#{proviceCode}, #{productNbr}, #{extProdInstId},#{custId},#{accessNbr}, #{statusCd}, to_date(#{statusDt}, 'YYYY-MM-DD HH24:MI:SS'), SYSDATE, '新装入表成功！',#{transactionId})    
+    </insert>
+    <!-- 政企稽核拆机-->
+    <update id="updateInternetBusProdAudit" parameterType="java.util.Map">
+		UPDATE INTERNET_BUSINESS_PROD_AUDIT T
+		   SET T.STATUS_CD = #{statusCd},
+		       T.STATUS_DT = to_date(#{statusDt}, 'YYYY-MM-DD HH24:MI:SS'),
+		       T.DEAL_TIME = sysdate,
+		       T.REMARK    = '拆机入表成功',
+		       T.TRANSACTION_ID = #{transactionId}
+		 WHERE T.EXT_PROD_INST_ID = #{extProdInstId}
+    </update>
+    
+    <!-- 稽核错误日志记录 -->
+    <insert id="insertUniteAuditFailLog">
+		insert into AUDIT_FAIL_LOG t
+		  (t.AUDIT_DATA_ORIGIN_ID, t.err_msg)
+		values
+		  (#{auditOriginDataId}, #{errM})    	
+    </insert>
+    
+    <!-- 查询稽核开关状态 -->
+    <select id="queryAuditSwitch" parameterType="java.lang.String" resultType="java.lang.String">
+    	select t.status from AUDIT_SWITCH t where t.bean_name = #{beanName}
+    </select>
+    
+    <!-- IVPN总量稽核 -->
+    <insert id="insertIvpnAllAudit" parameterType="java.util.Map">
+    	insert into cep_ivpn_all_audit
+		values
+		  (#{provinceCode},
+		   #{custID},
+		   #{cityCode},
+		   #{productNbr},
+		   #{custOrderType},
+		   #{PricePlanCode},
+		   #{ProdCode},
+		   sysdate,
+		   sysdate)
+    </insert>
+</mapper>

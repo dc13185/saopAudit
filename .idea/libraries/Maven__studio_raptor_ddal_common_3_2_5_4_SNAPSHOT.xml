@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: studio.raptor:ddal-common:3.2.5.4-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://F:/maven_repository/studio/raptor/ddal-common/3.2.5.4-SNAPSHOT/ddal-common-3.2.5.4-20190425.090256-3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://F:/maven_repository/studio/raptor/ddal-common/3.2.5.4-SNAPSHOT/ddal-common-3.2.5.4-20190425.090256-3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://F:/maven_repository/studio/raptor/ddal-common/3.2.5.4-SNAPSHOT/ddal-common-3.2.5.4-20190425.090256-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

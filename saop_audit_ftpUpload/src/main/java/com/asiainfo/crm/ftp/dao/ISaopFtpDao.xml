@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.asiainfo.crm.ftp.dao.ISaopFtpDao">
+	<!-- 数据转储 -->
+	<insert id="insertHistory" parameterType="java.util.Map">
+	     insert into dep_order_info_audit_4g_h select* from dep_order_info_audit_4g where deal_type in ('R')
+	</insert>
+	
+	<delete id="deleteSql" parameterType="java.util.Map">
+	     ${deleteSql}
+	</delete>
+    <!-- 数据转储 -->
+	
+	<!-- ftp上传日志 -->
+	<insert id="insertLog" parameterType="java.util.Map">
+		insert into dep_ftp_upload_log
+			(plat_code,
+			bus_code,
+			file_dt,
+			resend_time,
+			seq_num,
+			file_name,
+			<if test="createState != null and createState != ''">create_state,</if>
+			<if test="createDesc != null and createDesc != ''">create_desc,</if>
+			<if test="sendState != null and sendState != ''">send_state,</if>
+			<if test="sendDesc != null and sendDesc != ''">send_desc,</if>
+			version)
+	    values
+	        (#{platCode}, 
+	         #{busCode}, 
+	         #{fileDate}, 
+	         #{reSendTime}, 
+	         #{seqNum}, 
+	         #{fileName}, 
+	         <if test="createState != null and createState != ''">#{createState},</if>
+	         <if test="createDesc != null and createDesc != ''">#{createDesc},</if>
+	         <if test="sendState != null and sendState != ''">#{sendState},</if>
+	         <if test="sendDesc != null and sendDesc != ''">#{sendDesc},</if>
+	         sysdate)
+	</insert>
+	
+	<!-- ftp上传日志 -->
+	<update id="updateLog" parameterType="java.util.Map">
+		update dep_ftp_upload_log
+		   SET send_state = #{sendState}, send_desc = #{sendDesc}, file_name = #{fileName}, version = sysdate
+		 WHERE plat_code = #{platCode}
+		   AND bus_code = #{busCode}
+		   AND file_dt = #{fileDate}
+		   AND resend_time = #{reSendTime}
+		   AND seq_num = #{seqNum}	
+	</update>
+     
+    <!-- 文件上传结束后，将由于上传未处理成功的侦听记录状态改为D -->
+    <update id="updateListenAuditFlag">
+		update listen_audit_data_origin lado
+		   set lado.deal_flag = 'D'
+		 where lado.msg_content_key in (select ado.audit_data_origin_id
+		                         from audit_data_origin ado
+		                        where ado.process_state = 'S')
+    </update>
+    
+    <!-- 更改稽核开关 -->
+    <update id="updateAuditSwitch" parameterType="java.util.Map">
+    	update audit_switch t set t.status = #{status},t.version = sysdate where t.bean_name = #{wholeAuditbeanName}
+    </update>
+    
+    <!-- 查询稽核开关状态 -->
+    <select id="queryAuditSwitch" parameterType="java.lang.String" resultType="java.lang.String">
+    	select t.status from AUDIT_SWITCH t where t.bean_name = #{wholeAuditbeanName}
+    </select>
+    
+    <!-- 新增稽核开关 -->
+    <insert id="insertAuditSwitch" parameterType="java.util.Map">
+    	insert into audit_switch values(#{wholeAuditbeanName},#{status},sysdate,sysdate,'')
+    </insert>
+    
+    <!-- 省crm受理集团卡转储 imis为空的数据-->
+    <insert id="transCardInfo2His">
+		insert into cep_audit_c_card_inst_day_his
+		  (audit_dt,
+		   deal_type,
+		   action_type,
+		   common_region_id,
+		   mkt_res_cd,
+		   mkt_res_inst_code,
+		   iccid,
+		   imsi,
+		   imsi_g,
+		   imsi_lte,
+		   status_cd,
+		   status_date)
+		  select audit_dt,
+		         deal_type,
+		         action_type,
+		         common_region_id,
+		         mkt_res_cd,
+		         mkt_res_inst_code,
+		         iccid,
+		         imsi,
+		         imsi_g,
+		         imsi_lte,
+		         status_cd,
+		         status_date
+		    from cep_audit_c_card_inst_day t
+		   where t.imsi is null
+    </insert>
+    <!-- 省crm受理集团卡删除 imis为空的数据-->
+    <delete id="deleteCardInfo">
+    	delete from cep_audit_c_card_inst_day t where t.imsi is null
+    </delete>
+    
+    <!-- 将错误为unique constraint侦听调用失败的数据刷为D状态 重新跑-->
+    <update id="refreshListenAudit">
+		update listen_audit_data_origin l set l.deal_flag = 'D' where l.msg_content_key in (
+			select t.audit_data_origin_id
+  			  from audit_fail_log t
+ 			 where t.err_msg like '%unique constraint%' and trunc(t.creat_dt) = trunc(sysdate))
+    </update>
+    
+    <!-- 三级编码 -->
+    <select id="qryAreaId" resultType="java.util.Map">
+		select p_code areaId
+          from code_mapping
+         where map_domain = 'LANID_V2'
+           and substr(cm.p_code,4,5) = '00'    
+    </select>
+    
+    <select id="qryLandId" parameterType="java.lang.String" resultType="java.util.Map">
+    	 select p_code,h_code
+           from code_mapping
+          where map_domain = 'LANID_V2'
+    </select>
+    
+    <select id="qryZoneNbr" parameterType="java.lang.String" resultType="java.lang.String">
+    	 select p_code
+           from code_mapping
+          where map_domain = 'LANCODE_MAPPING_ID_2_ZNUM'
+            and h_code = #{lanId}
+    </select>
+</mapper>

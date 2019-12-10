@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+全局默认配置信息
+-->
+<defaults>
+  <!--中心的类型和实现类的对应关系-->
+  <center>
+    <!--
+    <property name="BillId:KeyNum" value="example.center.BillIdCenterImpl"/>
+    -->
+  </center>
+  <!--默认代理调用方式.默认采用pojo的模式进行调用，采用的实现类为配置的实现类-->
+  <proxy invoke="pojo" type="primitive">
+    <clazz name="com.ai.appframe2.complex.service.impl.LocalServiceInvokeImpl"/>
+  </proxy>
+    <!--  
+     <proxy invoke="pojo" type="primitive">
+    <clazz name="com.ai.appframe2.complex.service.impl.Was61ClientServiceInvokeImpl">
+	<property name="isAdvance" value="true"/>
+    <property name="server" value="system/service/app_cluster.xml"/>
+    <property name="client" value="system/service/web_connect_app_cluster.xml"/>
+    </clazz>
+     </proxy>
+   -->
+   
+  <!-- 
+  <interceptor>
+    <clazz name="example.customer.DAODataSourceInterceptorImpl"/>
+  </interceptor>
+  -->
+  
+  <!--默认事务信息.默认采用Required的方式进行事务操作，采用的实现类为配置的实现类-->
+  <transaction type="Required">
+    <!--<clazz name="com.ai.appframe2.complex.transaction.impl.LocalTransactionImpl"/>-->
+    <clazz name="com.ai.appframe2.complex.transaction.impl.LocalMutilTransactionImpl"/>
+    <!-- <clazz name="com.ai.appframe2.mongodb.transaction.impl.MongoDBTransactionImpl"/>  -->
+    <!--<clazz name="com.ai.appframe2.complex.transaction.impl.JtaTransactionImpl"/>-->
+    <!--<listener name="com.ai.appframe2.complex.transaction.listener.TestListenerImpl"/>-->
+    <!--映射每个服务模块对应的事务数据源，可以具体到类名-->
+    <mapping>
+      <!--平台自带-->
+      <property name="com.ai.appframe2.complex.self.service.base" value="base"/>
+      <property name="com.ai.appframe2.complex.self.service.check" value="base"/>
+      <!--secframe-->
+      <property name="com.ai.secframe" value="sec"/>
+      <property name="com.ai.frame" value="sec"/>
+      <property name="com.asiainfo.appframe.ext.exeframe" value="base"/>
+      <property name="example.customer" value="base"/>
+      <property name="example" value="base"/>
+      <property name="test" value="base"/>
+      <property name="example.customer" value="base"/>
+      <property name="com.asiainfo.portalframe" value="base"/>
+      <property name="com.asiainfo.crm" value="base"/>
+      <property name="example.jta.service" value="jta"/>
+      <property name="com.ai.aif.csf" value="base"/>
+     
+      <property name="com.asiainfo.appframe.ext.exeframe" value="base"/>
+    </mapping>
+  </transaction>
+  <!--默认数据源信息-->
+  <datasource>
+    <!--根据base取数据库配置，然后以本配置中的覆盖除base以外的连接池的配置-->
+    <!--默认 type=dbcp  db=oracle -->
+    <!-- 
+	<pool name="jta"  primary="true" type="jndi" >
+          <property name="name" value="jndi/comframe_wps"/>  
+          <property name="factory" value="com.ibm.websphere.naming.WsnInitialContextFactory"/>
+          <property name="url" value="iiop://10.11.20.125:9100"/> 
+          <property name="username" value="comframe_wps"/>
+          <property name="password" value="password"/>
+    </pool>
+    -->
+    <!--映射每个DAO模块对应的操作数据源-->
+    <clazz name="com.ai.appframe2.complex.datasource.impl.LocalMutilDataSourceImpl">
+      <property name="tableName" value="cfg_db_acct"/>
+    </clazz>
+    <!-- 
+    <clazz name="com.ai.appframe2.mongodb.datasource.impl.MongoDBDataSourceImpl">
+    </clazz>
+     -->
+     
+    <!-- 南京数据库 -->
+    <!-- <pool name="base" primary="true">
+      <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+      <property name="url" value="jdbc:oracle:thin:@10.21.20.155:1521:orcl"/>
+      <property name="username" value="aicsf"/>
+      <property name="password" value="Abcd123"/>
+      <property name="initialSize" value="0"/>
+      <property name="maxActive" value="2"/>
+      <property name="maxIdle" value="2"/>
+    </pool> -->
+    <!--
+    <pool name="base" primary="true">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+      <property name="url" value="jdbc:mysql://127.0.0.1:3306/csf"/>
+      <property name="username" value="shiwei"/>
+      <property name="password" value="password"/>
+      <property name="initialSize" value="0"/>
+      <property name="maxActive" value="2"/>
+      <property name="maxIdle" value="2"/>
+    </pool>
+    -->
+     <!-- fz数据库-->
+    <pool name="base" primary="true">
+      <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+      <property name="url" value="jdbc:oracle:thin:@192.168.1.24:1521:crmdb1"/>
+      <property name="username" value="aicsf"/>
+      <property name="password" value="Abcd123"/>
+      <property name="initialSize" value="0"/>
+      <property name="maxActive" value="2"/>
+      <property name="maxIdle" value="2"/>
+    </pool>
+    
+     <!-- 云南数据库 
+ 	 <pool name="base" primary="true">
+			<property name="driverClassName" value="oracle.jdbc.OracleDriver" />
+			<property name="url" value="jdbc:oracle:thin:@10.173.253.157:1521:crmdev"/>
+			<property name="username" value="UCR_PARAM" />
+			<property name="password" value="UCR_PARAM!123" />
+			
+			<property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl" />
+			<property name="username" value="UOP_PARAM" />
+			<property name="password" value="UOP_PARAM123" />
+			
+			<property name="initialSize" value="0" />
+			<property name="maxActive" value="2" />
+			<property name="maxIdle" value="2" />
+		</pool>-->
+   
+     <!-- 本地mysql环境 
+     <pool name="base" primary="true">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+      <property name="url" value="jdbc:mysql://127.0.0.1:3306/asf"/>
+      <property name="username" value="root"/>
+      <property name="password" value="sdd123"/>
+      <property name="initialSize" value="0"/>
+      <property name="maxActive" value="2"/>
+      <property name="maxIdle" value="2"/>
+    </pool>
+    -->
+    
+    <!-- 
+    <pool name="base" primary="true">
+        <property name="clusterList" value="127.0.0.1:27017"/>
+	    <property name="dbname" value="esb"/>
+        <property name="connperdb" value="100"/> -->
+      
+       <!-- 
+	   <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+       <property name="url" value="jdbc:oracle:thin:@localhost:1521:DH"/>
+       <property name="username" value="base"/>
+       <property name="password" value="base"/>
+	   <property name="initialSize" value="0"/>
+	   <property name="maxActive" value="2"/>
+	   <property name="maxIdle" value="2"/> 
+	     -->
+      <!--
+	   <property name="driverClassName" value="com.ibm.db2.jcc.DB2Driver"/>
+	   <property name="url" value="jdbc:db2://10.11.16.25:50000/NJDEV:currentSchema=BASE;"/>
+	   <property name="username" value="yanghua"/>
+	   <property name="password" value="yanghua"/>
+	   -->
+      <!-- 
+	   <property name="driverClassName" value="com.mysql.jdbc.Driver"/> 
+	   <property name="url" value="jdbc:mysql://localhost/test?rewriteBatchedStatements=true&amp;cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=true&amp;characterEncoding=GBK&amp;autoReconnect=true&amp;failOverReadOnly=false"/>
+ 
+	   <property name="url" value="jdbc:mysql://localhost/base?rewriteBatchedStatements=true&amp;cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=true&amp;characterEncoding=GBK&amp;autoReconnect=true&amp;failOverReadOnly=false"/>
+	   <property name="username" value="base"/>
+	   <property name="password" value="base"/>
+	  
+
+	   <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+	   <property name="url" value="jdbc:oracle:thin:@localhost:1521:ora9i"/>
+ 
+	   <property name="username" value="base"/>
+	   <property name="password" value="base"/>
+  
+	     <property name="initialSize" value="3"/>
+	   <property name="maxActive" value="3"/>
+	   <property name="maxIdle" value="3"/>
+	   <property name="maxWait" value="20000"/>
+       -->
+      <!--  
+      <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
+   
+      <property name="url" value="jdbc:sybase:Tds:192.168.1.104:5000/njdev"/>
+      <property name="username" value="base"/>
+      <property name="password" value="base-123"/>
+     -->
+     <!--
+    </pool>
+    -->
+    <mapping>
+      <!--平台自带-->
+      <property name="com.ai.appframe2.complex.self" value="base"/>
+      <property name="com.ai.appframe2.complex.self" value="base"/>
+      <!--secframe-->
+      <property name="example" value="base"/>
+      <property name="example.customer" value="base"/>
+      <property name="test" value="base"/>
+      <!-- aiportal -->
+      <property name="com.asiainfo.appframe.ext.exeframe.msg" value="base"/>
+      <property name="com.asiainfo.portalframe" value="base"/>
+      <property name="com.asiainfo.crm" value="base"/>
+      <property name="com.ai.appframe2.complex.tab" value="base"/>
+      <property name="example.jta.service" value="jta"/>
+      <property name="com.ai.aif.csf" value="base"/>
+       <!-- mongo -->
+      <property name="com.ai.appframe2.mongodb" value="base"/>
+      <property name="com.asiainfo.appframe.ext.exeframe" value="base"/>
+    </mapping>
+  </datasource>
+  <!--包含的服务配置文件-->
+  <!--权限-->
+  <include type="sv" classpath="system/service/appframe-service.xml"/>
+  <!--  <include type="sv" classpath="system/service/uip-service.xml"/>  -->
+  <!-- -->
+  <!--平台-->
+</defaults>

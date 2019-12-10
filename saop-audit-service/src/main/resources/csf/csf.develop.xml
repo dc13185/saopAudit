@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Csf>
+   <Category name="direct" description="直连方式通用配置">
+   		<Item name="direct.centercode.fetcher">
+   			<value></value>
+   			<description>
+   			1、配置com.ai.aif.csf.api.client.direct.IDirect接口的实现类
+   			2、直连模式根据serviceCode获取归属中心
+   			3、如果不配置该类，直连模式只能支持到服务级别
+   			</description>
+   		</Item>
+   		<Item name="direct.serviceinfo.constructor">
+   			<value></value>
+   			<description>
+				1、配置IDeveplopServiceInfoConstructor接口的实现
+				2、开发模式下才可能需要配置该项，根据serviceCode命名，还原出服务调用信息;因此需要serviceCode的命名，能够还原出服务调用信息
+				3、该模式下，可以不依赖注册的服务资产信息，即所调用的服务可以不注册
+   			</description>
+   		</Item>
+   </Category>
+   
+   <Category name="service.direct" description="服务级别直连方式，会覆盖中心级别的直连方式">
+		<Item name="order_pay">
+			<value>
+			</value>
+			<description>
+				Item name配置需要直连的服务编码serviceCode，value配置直连的url,多个服务编码serviceCode使用分号;分割
+			</description>
+		</Item>
+	</Category>
+	
+	<Category name="centercode.direct" description="中心级别直连方式">
+		<Item name="order">
+			<value>url</value>
+			<description>
+			Item name配置需要直连的中心编码centerCode，value配置直连的url
+			多个中心编码centerCode使用分号;分割
+			</description>
+		</Item>
+	</Category>
+</Csf>

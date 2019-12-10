@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xmlns:aop="http://www.springframework.org/schema/aop"  
+    xmlns:context="http://www.springframework.org/schema/context"  
+    xmlns:task="http://www.springframework.org/schema/task"  
+    xsi:schemaLocation="  
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd  
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd"  
+    default-lazy-init="true">  
+    
+    <bean id="myTask" class="com.asiainfo.crm.ftp.job.Jobs" />
+	<task:scheduled-tasks>  
+	    <!-- 4G订单信息稽核 -->
+		<task:scheduled ref="myTask" method="orderInfoAudit4G" cron="0 0 0 * * ?" />
+		<!-- 4G订单费用稽核 -->
+	    <task:scheduled ref="myTask" method="orderchargeAudit4G" cron="0 0 0 * * ?" />
+	    <!-- 4G产品实例日稽核 -->
+	    <task:scheduled ref="myTask" method="prodInstDailyAudit4G" cron="0 0 0 * * ?" />
+	    <!-- 4G产品实例月稽核暂不改造 -->
+	    <!-- <task:scheduled ref="myTask" method="prodInstMonthAudit4G" cron="0 0 0 10,20 * ?" /> -->
+	    <!-- 4G销售品实例日稽核 -->
+	    <task:scheduled ref="myTask" method="offerDailyAudit4G" cron="0 0 0 * * ?" />
+	    <!-- 4G销售品实例月稽核 -->
+	    <task:scheduled ref="myTask" method="offerMonthAudit4G" cron="0 0 0 10,20 * ?" />
+	    <!-- 4G产品状态激活 -->
+	    <task:scheduled ref="myTask" method="prodActivationAudit4G" cron="0 0 0 * * ?" />
+	</task:scheduled-tasks>
+
+</beans>

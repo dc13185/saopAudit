@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.asiainfo.crm</groupId>
+		<artifactId>blueprint-parent</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../blueprint-parent</relativePath>
+
+	</parent>
+	<artifactId>saop-audit-service</artifactId>
+	<version>0.1</version>
+	<packaging>war</packaging>
+
+	<name>saop-audit-service Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<jetty.version>9.2.15.v20160210</jetty.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.asiainfo.crm</groupId>
+			<artifactId>saop-audit</artifactId>
+			<version>0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.asiainfo.crm</groupId>
+			<artifactId>saop_audit_ftpUpload</artifactId>
+			<version>0.1</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>saop-audit-service</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.4.1.v20170120</version>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

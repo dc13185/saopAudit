@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.asiainfo.crm.ftp.dao.IResourceADao">
+	
+    <select id="qryPhoneNumber" parameterType="java.util.Map" resultType="java.util.Map">
+		select *
+		  from (select A.*, rownum rn
+		          from (select /*+parallel(pn,8),(pnp,8),(p2s,8)*/
+		                 pn.phone_number,
+		                 decode(pn.rsc_status_cd, '3', '1004', '1003') status,
+		                 (select a.zone_number
+		                    from area a
+		                   where a.area_id = pn.area_id
+		                     and rownum = 1) zone_number,
+		                  substr(pn.area_id, 0, 3) || '00' area_id
+		                  from phone_number     pn,
+		                       phone_number_pool pnp,
+		                       pool_2_spec       p2s
+		                 where pnp.pool_id = p2s.pool_id
+		                   and pn.pool_id = pnp.pool_id
+		                   and p2s.pool_spec_cd = 3) A
+		                   where rownum &lt;= ${end})
+		 where rn &gt;= ${start}
+    </select>
+    
+    <select id="qryPhoneNumberCount" resultType="java.lang.Integer">
+		select /*+parallel(pn,8),(pnp,8),(p2s,8)*/
+		 	count(1)
+		  from phone_number pn, phone_number_pool pnp, pool_2_spec p2s
+		 where pnp.pool_id = p2s.pool_id
+		   and pn.pool_id = pnp.pool_id
+		   and p2s.pool_spec_cd = 3  
+    </select>
+    
+    <select id="qryCardRes" parameterType="java.lang.String" resultType="java.util.Map">
+		select /*+parallel(a,8),(b,8),(c,8)*/a.terminal_dev_id,
+		       decode(c.rsc_status_cd, '3', '1004', '1003') rsc_status
+		  from TERMINAL_DEV_2_DEV_NUM a,
+		       terminal_dev_item      b,
+		       DEVICE_NUMBER          c
+		 where a.terminal_dev_id = b.terminal_dev_id
+		   and a.dev_num_id = c.dev_num_id
+		   and b.item_spec_id = '30951'
+		   and b.value = '1'
+		   and c.an_type_cd = '509'
+		   and substr(c.area_id,0,3) || '00' = #{area_id}
+    </select>
+    
+    <!-- iccId -->
+    <select id='qryTerminalCode' parameterType="java.lang.String" resultType="java.lang.String">
+    	select d.terminal_code ICCID
+                  from terminal_device d
+                 where d.terminal_dev_id = #{terminal_dev_id}
+    </select>
+    
+    <!-- 卡资源查imis status_cd areaId -->
+    <select id='qryDevNum' parameterType="java.lang.String" resultType="java.util.Map">
+		select dev_num,
+		         an_type_cd,
+		         decode(rsc_status_cd, '3', '1004', '1003') RSC_STATUS_CD,
+		         area_id,
+		         (select d.terminal_code
+                  from terminal_device d
+                 where d.terminal_dev_id = #{terminal_dev_id}) ICCID
+		          from DEVICE_NUMBER
+		         where DEV_NUM_ID in
+		               (select t.dev_num_id
+		                  from TERMINAL_DEV_2_DEV_NUM t
+		                 where t.terminal_dev_id = #{terminalDevId})
+    </select>
+    
+    <!-- 查terminal_dev_item记录总数 -->
+    <select id="qryCount" resultType="java.lang.Integer">
+		select /*+parallel(64)*/
+		 count(1)
+		  from terminal_dev_item b
+		 where b.item_spec_id = 30951
+		   and b.value = '1'
+    </select>
+	
+	<!-- 查terminal_dev_item的 TERMINAL_DEV_ID-->	     
+	<select id="qryterminalDevId" parameterType="java.util.Map" resultType="java.util.Map" fetchSize="1000"> 
+		SELECT TERMINAL_DEV_ID
+		  FROM (SELECT A.TERMINAL_DEV_ID, ROWNUM RN
+		          FROM (SELECT B.TERMINAL_DEV_ID
+  						  FROM TERMINAL_DEV_ITEM B
+                         WHERE B.ITEM_SPEC_ID = 30951
+                           AND B.VALUE = '1') A
+                         WHERE ROWNUM &lt;= ${end})
+		 WHERE RN &gt;= ${start}	
+	</select>
+	
+	<!-- 通过terminalDevId查出DevNumId -->
+	<select id="qryDevNumId" parameterType="java.lang.String" resultType="java.util.Map">
+		select t.dev_num_id from TERMINAL_DEV_2_DEV_NUM t where t.terminal_dev_id = #{terminalDevId}
+	</select>
+</mapper>

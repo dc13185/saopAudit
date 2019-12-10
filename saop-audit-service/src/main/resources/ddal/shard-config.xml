@@ -1,0 +1,74 @@
+<dbShard xmlns="http://ddal.raptor.studio/shard-config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://ddal.raptor.studio/shard-config">
+        <!--虚拟数据库管理 -->
+    <virtualDBs>
+        <virtualDB name="saop_audit" shardGroup="oracle" rmOwner="true" sqlMaxLimit="-1">
+			<table name="CODE_MAPPING" type="global"></table>
+			<table name="TRANSACT_LOG" type="global"></table>
+			<table name="TRANSACT_LOG_INFO" type="global"></table>
+			<table name="MESSAGE_ORDER" type="global"></table>
+			<table name="MESSAGE_ORDER_INFO" type="global"></table>
+			<table name="AUDIT_DATA_ORIGIN" type="global"></table>
+			<table name="LISTEN_AUDIT_DATA_ORIGIN" type="global"></table>
+			<table name="SERVICE_INST" type="global"></table>
+			<table name="AUDIT_FAIL_LOG" type="global"></table>
+			<table name="AUDIT_SWITCH" type="global"></table>
+			<table name="CEP_AUDET_DAIKUAN_ALL" type="global"></table>
+			<table name="CEP_AUDIT_4G_CARD_RESOURCE" type="global"></table>
+			<table name="CEP_AUDIT_4G_PHONE_NUMBER" type="global"></table>
+			<table name="CEP_AUDIT_C_CARD_INST_DAY" type="global"></table>
+			<table name="CEP_IVPN_ALL_AUDIT" type="global"></table>
+			<table name="CEP_PROD_C" type="global"></table>
+			<table name="CEP_TERMINAL_ALL_AUDIT" type="global"></table>
+			<table name="CEP_TERMINAL_DAY_AUDIT" type="global"></table>
+			<table name="CEP_TO_GC_CHK_INIT" type="global"></table>
+			<table name="CEP_TO_WAP_CHK_INIT" type="global"></table>
+			<table name="DDN_AUDIT" type="global"></table>
+			<table name="DDN_AUDIT_DATA_ADD" type="global"></table>
+			<table name="DEP_4GAUDIT_ERRLOG" type="global"></table>
+			<table name="DEP_AUDIT_FAIL_LOG" type="global"></table>
+			<table name="DEP_CLOUDCARD_DAY_AUDIT" type="global"></table>
+			<table name="DEP_CLOUDCARD_MONTH_AUDIT" type="global"></table>
+			<table name="DEP_FTP_UPLOAD_LOG" type="global"></table>
+			<table name="DEP_OFFER_DAILY_AUDIT_4G" type="global"></table>
+			<table name="DEP_OFFER_MONTHLY_AUDIT_4G" type="global"></table>
+			<table name="DEP_ORDER_CHARGE_AUDIT" type="global"></table>
+			<table name="DEP_ORDER_CHARGE_AUDIT_4G" type="global"></table>
+			<table name="DEP_ORDER_INFO_AUDIT" type="global"></table>
+			<table name="DEP_ORDER_INFO_AUDIT_4G" type="global"></table>
+			<table name="DEP_PROD_ACTIVATION_AUDIT" type="global"></table>
+			<table name="DEP_PROD_ACTIVATION_AUDIT_4G" type="global"></table>
+			<table name="DEP_PROD_DAILY_AUDIT_4G" type="global"></table>
+			<table name="DEP_PROD_MONTHLY_AUDIT_4G" type="global"></table>
+			<table name="DEP_P_CHARGE_INCRE_AUDIT" type="global"></table>
+			<table name="DEP_P_CHARGE_INCRE_ITEM_AUDIT" type="global"></table>
+			<table name="DEP_P_CHARGE_WHOLE_AUDIT" type="global"></table>
+			<table name="INTERNET_BUSINESS_PROD_AUDIT" type="global"></table>
+	</virtualDB>
+    </virtualDBs>
+    <shardGroups>
+        <shardGroup name="oracle">
+            <shard name="shard_0" dsGroup="group1" schema="saop_audit" />
+        </shardGroup>
+    </shardGroups>   
+    <!-- 物理数据库集群管理 -->
+    <physicalDBClusters>
+        <physicalDBCluster name="cluster1" type="oracle">
+			<dbInstance name="inst1" hostname="133.0.205.174" port="1521" serviceName="SAOP" rw="W" role="M0" status="O" />
+        </physicalDBCluster>
+    </physicalDBClusters>
+    <!--数据源管理 -->
+    <dataSources>
+        <group name="group1" relaCluster="cluster1">
+			<dataSource user="SAOP_AUDIT" pwd="Hbdx_2019" dbInstName="inst1" dbDriver="jdbc">
+				<params>
+					<property name="minIdle" value="10" />
+					<property name="maxIdle" value="50" />
+					<property name="maxTotal" value="100" />
+					<property name="timeBetweenEvictionRunsMillis" value="5000" />
+					<property name="testWhileIdle" value="false" />
+				</params>
+			</dataSource>
+        </group>
+    </dataSources>
+</dbShard>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/blueprint-parent/blueprint-parent.iml" filepath="$PROJECT_DIR$/blueprint-parent/blueprint-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/saop-audit/saop-audit.iml" filepath="$PROJECT_DIR$/saop-audit/saop-audit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/saop-audit-model/saop-audit-model.iml" filepath="$PROJECT_DIR$/saop-audit-model/saop-audit-model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/saop-audit-service/saop-audit-service.iml" filepath="$PROJECT_DIR$/saop-audit-service/saop-audit-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/saopAudit.iml" filepath="$PROJECT_DIR$/.idea/saopAudit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/saop_audit_ftpUpload/saop_audit_ftpUpload.iml" filepath="$PROJECT_DIR$/saop_audit_ftpUpload/saop_audit_ftpUpload.iml" />
+    </modules>
+  </component>
+</project>

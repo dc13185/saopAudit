@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- 将指定接口中的方法切换到远程 -->
+	<rmi path="* com.asiainfo.crm.blueprint.intf.IQueryProdInstMutilSmo.*(..)"
+		adapter="com.asiainfo.crm.bcomm.serv.invoker.RemoteInvokeAdapter" uri="http://133.0.208.1:9700/inst-service" />
+	<rmi path="* com.asiainfo.crm.blueprint.intf.IInstIntfQuerySmo.*(..)"
+		adapter="com.asiainfo.crm.bcomm.serv.invoker.RemoteInvokeAdapter" uri="http://133.0.208.1:9700/inst-service" />
+	<rmi path="* com.asiainfo.crm.blueprint.intf.IOrderQuerySmo.*(..)"
+		adapter="com.asiainfo.crm.bcomm.serv.invoker.RemoteInvokeAdapter" uri="http://133.0.208.1:9700/so-service" />
+	<rmi path="* com.asiainfo.crm.blueprint.intf.IResourcesQuerySmo.*(..)"
+		adapter="com.asiainfo.crm.bcomm.serv.invoker.RemoteInvokeAdapter" uri="http://133.0.208.1:9700/resources-service" />
+</configuration>

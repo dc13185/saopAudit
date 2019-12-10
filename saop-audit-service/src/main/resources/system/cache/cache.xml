@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<caches>
+
+   <quartz>
+       <!--线程池-->
+       <property name="org.quartz.threadPool.class" value="org.quartz.simpl.SimpleThreadPool"/>
+       <property name="org.quartz.threadPool.threadCount" value="3"/>
+       <property name="org.quartz.threadPool.threadPriority" value="5"/>
+       <property name="org.quartz.threadPool.makeThreadsDaemons" value="true"/>
+
+       <!--scheduler-->
+       <property name="org.quartz.scheduler.instanceName" value="CacheScheduler"/>
+       <property name="org.quartz.scheduler.makeSchedulerThreadDaemon" value="true"/>
+
+       <!--JobStore-->
+       <property name="org.quartz.jobStore.misfireThreshold" value="60000"/>
+       <property name="org.quartz.jobStore.class" value="org.quartz.simpl.RAMJobStore"/>
+   </quartz>
+
+   <!--默认都是需要init的-->
+
+   <!--主机和数据库时隙,每天凌晨2点刷新-->
+   <cache id="com.ai.appframe2.complex.cache.impl.SysDateCacheImpl">
+       <property name="cronExpression" value="0 0 0/20 * * ?"/>
+   </cache>
+
+   <!--分表关系-->
+   <!-- 
+   <cache id="com.ai.appframe2.complex.cache.impl.TableSplitCacheImpl"/>
+ -->
+   <!--分表映射关系-->
+   <!-- 
+   <cache id="com.ai.appframe2.complex.cache.impl.TableSplitFunctionCacheImpl"/>
+ -->
+   <!--分表函数关系-->
+   <!-- 
+   <cache id="com.ai.appframe2.complex.cache.impl.TableSplitMappingCacheImpl"/>
+ -->
+   <!--IdGenerator-->
+   <cache id="com.ai.appframe2.complex.cache.impl.IdGeneratorCacheImpl"/>
+
+   <!--IdGeneratorWrapper-->
+   <cache id="com.ai.appframe2.complex.cache.impl.IdGeneratorWrapperCacheImpl"/>
+
+   <!--BatchIdGenerator关系-->
+   <cache id="com.ai.appframe2.complex.cache.impl.BatchIdGeneratorCacheImpl"/>
+<!--<cache id="com.asiainfo.crm.common.cache.JavaI18nResourceCacheImpl"/>-->
+   <!--bo模糊化-->
+   <cache id="com.ai.appframe2.complex.cache.impl.BOMaskCacheImpl" init="true"/>
+   
+   <!-- csf exception cache 
+   <cache id="com.ai.aif.csf.client.exception.cache.SipExceptionDefCacheImpl" init="true"/>
+   <cache id="com.ai.aif.csf.client.exception.cache.SipExceptionMapCacheImpl" init="true"/>
+   -->
+	<!--
+		======================================================================
+		=================comframe配置的CACHE，默认都是需要init的==================
+		======================================================================
+	
+	<cache id="com.ai.comframe.cache.VmQueueConfigCacheImpl" init="true" >
+		<property name="cronExpression" value="0 1 2 * * ?" />
+	</cache>
+	<cache id="com.ai.comframe.cache.VmTemplateCacheImpl" init="true">
+		<property name="cronExpression" value="0 2 2 * * ?" />
+	</cache>
+	<cache id="com.ai.comframe.cache.VmAlarmConfigCacheImpl" init="true" >
+		<property name="cronExpression" value="0 3 2 * * ?" />
+	</cache>
+	<cache id="com.ai.comframe.cache.VmHoliDayCacheImpl" init="true" >
+		<property name="cronExpression" value="0 4 2 * * ?" />
+	</cache>
+	<cache id="com.ai.comframe.cache.VmTemplateVersionCacheImpl" init="true" >
+		<property name="cronExpression" value="0 5 2 * * ?" />
+	</cache>
+	
+	-->
+</caches>

@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>saop_audit_ftpUpload</artifactId>
+  <parent>
+		<groupId>com.asiainfo.crm</groupId>
+	    <artifactId>blueprint-parent</artifactId>
+	    <version>0.0.1</version>
+	    <relativePath>../blueprint-parent</relativePath>
+  </parent>
+  
+     <dependencies>
+ 	    <!--  axis 1.4 jar start -->
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis-jaxrpc</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis-saaj</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+       <!--  axis 1.4 jar end -->
+       <!-- SFTPUtil start -->
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.53</version>
+		</dependency>
+       <!-- SFTPUtil end -->
+       <!-- FTPUtil FTPClient start -->
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.2</version>
+		</dependency>
+       <!-- FTPUtil FTPClient end -->
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>3.9</version>
+		</dependency>
+
+	</dependencies>
+	<version>0.1</version>
+	<build>
+		<finalName>saop_audit_ftpUpload</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.4.1.v20170120</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>

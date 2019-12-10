@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Csf>
+	<Category name="http.server.common" description="http server配置">
+		<Item name="port">
+			<value>7777</value>
+			<description>监听端口</description>
+		</Item>
+		<Item name="maxIdleTime">
+			<value>3000</value>
+			<description>SO_TIMEOUT</description>
+		</Item>
+		<Item name="acceptors">
+			<value>1</value>
+			<description>accept线程</description>
+		</Item>
+		<Item name="acceptQueueSize">
+			<value>5</value>
+			<description>accept队列</description>
+		</Item>
+	</Category>	
+</Csf>

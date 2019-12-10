@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: studio.raptor:ddal-jdbc:3.2.5.4-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://F:/maven_repository/studio/raptor/ddal-jdbc/3.2.5.4-SNAPSHOT/ddal-jdbc-3.2.5.4-20190331.144536-2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://F:/maven_repository/studio/raptor/ddal-jdbc/3.2.5.4-SNAPSHOT/ddal-jdbc-3.2.5.4-20190331.144536-2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://F:/maven_repository/studio/raptor/ddal-jdbc/3.2.5.4-SNAPSHOT/ddal-jdbc-3.2.5.4-20190331.144536-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
