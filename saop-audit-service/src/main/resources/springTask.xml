@@ -27,13 +27,13 @@
 		<!-- 4G订单费用稽核(0点) -->
 		<task:scheduled ref="ftpUploadTask" method="orderchargeAudit4G" cron="0 0 0 * * ?" />
 		<!-- 4G产品实例日稽核(1点) -->
-		 <task:scheduled ref="ftpUploadTask" method="prodInstDailyAudit4G" cron="0 0 1 * * ? " />
-		<!-- 4G产品实例月稽核暂不改造 -->
-		<task:scheduled ref="ftpUploadTask" method="prodInstMonthAudit4G" cron="0 0 0 10,20 * ?" />
+		 <task:scheduled ref="ftpUploadTask" method="prodInstDailyAudit4G" cron="0 0 1 * * ?" />
+		<!-- 4G产品实例月稽核(每月最后一天)-->
+		<task:scheduled ref="ftpUploadTask" method="prodInstMonthAudit4G" cron="0 0 0 1 * ? " />
 		<!-- 4G销售品实例日稽核(2点) -->
-		 <task:scheduled ref="ftpUploadTask" method="offerDailyAudit4G" cron="0 0 2 * * ? " />
-		<!-- 4G销售品实例月稽核  -->
-		 <task:scheduled ref="ftpUploadTask" method="offerMonthAudit4G" cron="0 0 0 10,20 * ?" />
+		 <task:scheduled ref="ftpUploadTask" method="offerDailyAudit4G" cron="0 0 2 * * ?" />
+		<!-- 4G销售品实例月稽核(每月一号2点)  -->
+		 <task:scheduled ref="ftpUploadTask" method="offerMonthAudit4G" cron="0 0 2 1 * ? " />
 		<!-- 4G产品状态激活 -->
 		<!--<task:scheduled ref="ftpUploadTask" method="prodActivationAudit4G" cron="0 0 0 * * ?" />-->
 		<!-- c网全量稽核 本次不用单独上传-->
