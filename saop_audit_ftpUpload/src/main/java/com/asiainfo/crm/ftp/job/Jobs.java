@@ -1,5 +1,6 @@
 package com.asiainfo.crm.ftp.job;
 
+import com.asiainfo.crm.order.common.MessageOrderHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.asiainfo.crm.ftp.dao.ISaopFtpDao;
@@ -26,6 +27,9 @@ public class Jobs {
 
 	@Autowired
 	LteCardResAudit lteCardResAudit;
+
+	@Autowired
+	MessageOrderHandle messageOrderHandle;
 
 	// 4G订单信息稽核
 	public void orderInfoAudit4G() {
@@ -55,6 +59,10 @@ public class Jobs {
 	// 4G销售品实例月稽核
 	public void offerMonthAudit4G() {
 		saopFtpSmo.execute("BUS60027");
+	}
+
+	public void finalReport() throws Exception {
+		messageOrderHandle.finalReport();
 	}
 
 	// 4G产品状态激活

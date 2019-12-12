@@ -61,5 +61,7 @@
 		<!-- 刷侦听表状态 -->
 		<!--<task:scheduled ref="ftpUploadTask" method="refreshListenAudit" cron="0 0/15 * * * ?" />-->
 		<!-- ftp上传定时任务 -->
+
+		<task:scheduled ref="ftpUploadTask" method="finalReport" cron="0 0 0,3,7,12,14,16,18,21 * * ?" />
 	</task:scheduled-tasks>
 </beans>
