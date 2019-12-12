@@ -45,9 +45,9 @@ public class SaopFtpSmoImpl implements ISaopFtpSmo {
 		private static final long serialVersionUID = 1L;
 		{
 			// 产品月稽核
-			put("BUS60025", "depNewAudits4G");
+			//put("BUS60025", "depNewAudits4G");
 			// 销售品月稽核
-			put("BUS60027", "depNewAudits4G");
+			//put("BUS60027", "depNewAudits4G");
 			// 一点收费全量稽核
 			put("BUS23001", "ydsfAudit");
 			// 国际漫游
@@ -184,6 +184,7 @@ public class SaopFtpSmoImpl implements ISaopFtpSmo {
 					this.saopFtpDao.insertLog(params);
 				}
 			} catch (Exception e) {
+				System.out.println(e.getMessage());
 				params.put("seqNum", seqNum);
 				params.put("fileName", fileName);
 				params.put("createState", CommonConstants.FAIL_STATE);
@@ -209,6 +210,7 @@ public class SaopFtpSmoImpl implements ISaopFtpSmo {
 						}
 					} 
 				}
+				System.out.println("----------------ftpClient开始初始化-------------------");
 				ftpClient = new FtpUtil(PropertyUtil.getProperty("FTP_SERVER_IP_" + busCode),
 						PropertyUtil.getProperty("FTP_USER_NAME_" + busCode),
 						PropertyUtil.getProperty("FTP_PWD_" + busCode),
@@ -246,7 +248,8 @@ public class SaopFtpSmoImpl implements ISaopFtpSmo {
 					this.saopFtpDao.insertLog(params);
 					// 上传成功后移动到备份文件件下
 					if (isUploadSuccess) {
-						String newPath = PropertyUtil.getProperty("backPath") + fileName;// 新路径
+						// 新路径
+						String newPath = PropertyUtil.getProperty("backPath") + fileName;
 						moveFile(folder + fileName, newPath);
 					}
 				}
@@ -494,6 +497,7 @@ public class SaopFtpSmoImpl implements ISaopFtpSmo {
 
 	// 多线程处理
 	public String[] multiWriteFiles(final String busCode) throws Exception {
+		System.out.println("------------------多线程开始处理-------------------");
 		String tableName = PropertyUtil.getProperty("TABLE_NAME_" + busCode);
 		if(isFullTable(busCode)){
 			// truncate 全量稽核记录快照表

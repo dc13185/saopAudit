@@ -1,9 +1,6 @@
 package com.asiainfo.crm.ftp.common;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
@@ -68,7 +65,8 @@ public class FtpUtil implements IFtpClient{
 	 * @return
 	 * @throws BMOException
 	 */
-	public boolean uploadFileToFtpServ( String loaclPath,String remoteUploadPath, String fileName)
+	@Override
+	public boolean uploadFileToFtpServ(String loaclPath, String remoteUploadPath, String fileName)
 			throws Exception {
 		BufferedInputStream input = null;
 		boolean success = false;
@@ -78,12 +76,20 @@ public class FtpUtil implements IFtpClient{
 				if (srcFile.exists()) {
 					logger.debug("uploading file="+fileName);
 					input = new BufferedInputStream(new FileInputStream(srcFile));
+					//没有文件夹就创建
+					//ftpClient.makeDirectory(remoteUploadPath);
 					boolean flag = ftpClient.changeWorkingDirectory(remoteUploadPath);
+					String updateLog = "";
 					if (flag){
-						logger.info("----------------------------ftp文件上传成功----------------------------------------");
+						System.out.println("文件"+fileName+"ftp文件上传成功(切换到对应路径失败)");
+						updateLog = "文件"+fileName+"ftp文件上传成功(文件上传成功)\r";
+						logger.error("----------------------------ftp文件上传成功----------------------------------------");
 					}else{
+						System.out.println("文件"+fileName+"ftp文件上传失败，请检查文件路径(切换到对应路径失败)");
 						logger.error("-------------------------ftp文件上传失败，请检查文件路径----------------------------");
+						updateLog = "文件"+fileName+"ftp文件上传失败，请检查文件路径(切换到对应路径失败)\n";
 					}
+					saveAsFileWriter(loaclPath+"updateLog.txt",updateLog);
 					ftpClient.enterLocalPassiveMode();
 					// 要求上传过程中为.ing的文件，上传结束后为.txt的文件
 					ftpClient.storeFile(srcFile.getName() + ".ing", input);
@@ -125,5 +131,25 @@ public class FtpUtil implements IFtpClient{
 			throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	private static void saveAsFileWriter(String filePath,String content) {
+		FileOutputStream fos = null;
+		try {
+			//true不覆盖已有内容
+			fos = new FileOutputStream(filePath, true);
+			//写入
+			fos.write(content.getBytes());
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			try {
+				fos.flush();
+				fos.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 }
