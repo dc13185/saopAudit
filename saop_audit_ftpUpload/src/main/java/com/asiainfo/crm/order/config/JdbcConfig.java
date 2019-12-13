@@ -72,5 +72,10 @@ public class JdbcConfig {
         return new JdbcTemplate(dataSource);
     }
 
+    @Bean(name="auditJdbcTemplate")
+    public JdbcTemplate createAuditJdbcTemplate(@Qualifier("saopaudit")DataSource dataSource){
+        return new JdbcTemplate(dataSource);
+    }
+
 
 }
