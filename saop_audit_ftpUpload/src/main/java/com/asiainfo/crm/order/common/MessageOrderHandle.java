@@ -1,11 +1,16 @@
 package com.asiainfo.crm.order.common;
 
 import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.crm.ftp.common.DateUtil;
 import com.asiainfo.crm.order.dao.MessageOrderDao;
+import com.asiainfo.crm.order.util.FlieUtils;
 import com.asiainfo.crm.order.util.HttpRemoteCallClient;
+import com.asiainfo.crm.order.util.PropertiesUtil;
+import com.ctc.wstx.util.DataUtil;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
@@ -84,10 +89,19 @@ public class MessageOrderHandle {
         saopMsgSB.append("\"traceId\":\"");
         saopMsgSB.append(traceId);
         saopMsgSB.append("\"}}}}");
-
         String url = "http://133.0.208.1:9700/saop-service/service/saop_exchange";
         String responseStr = HttpRemoteCallClient.callRemote(url, saopMsgSB.toString(), 0, 0, null, null);
         System.out.println(responseStr);
+        String logFile = PropertiesUtil.getProperty("logFile");
+        String logPath = PropertiesUtil.getProperty("logPath");
+        String nowTime = DateUtil.getNowTime(DateUtil.DATE_FORMATE_STRING_DEFAULT_D);
+        String wirtStr="";
+        if(responseStr.contains("撤单")){
+             wirtStr =  nowTime+" 订单:"+custOrderId+"已被撤单，请进行异常报竣\r";
+        }else{
+             wirtStr =  nowTime+" 订单:"+custOrderId+"已报竣，请进行异常报竣\r";
+        }
+        FlieUtils.saveAsFileWriter(logPath+logFile,wirtStr);
     }
 
     public String inTraceIdSaop(String custOrderId) {
