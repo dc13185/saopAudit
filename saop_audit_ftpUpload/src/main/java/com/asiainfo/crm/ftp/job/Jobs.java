@@ -1,6 +1,8 @@
 package com.asiainfo.crm.ftp.job;
 
+import com.asiainfo.crm.order.common.DumpData;
 import com.asiainfo.crm.order.common.MessageOrderHandle;
+import com.asiainfo.crm.order.common.TemporaryProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.asiainfo.crm.ftp.dao.ISaopFtpDao;
@@ -30,6 +32,9 @@ public class Jobs {
 
 	@Autowired
 	MessageOrderHandle messageOrderHandle;
+
+	@Autowired
+	DumpData dumpData;
 
 	// 4G订单信息稽核
 	public void orderInfoAudit4G() {
@@ -63,6 +68,10 @@ public class Jobs {
 
 	public void finalReport() throws Exception {
 		messageOrderHandle.finalReport();
+	}
+
+	public void temporary () throws Exception {
+		dumpData.dumpMessageOrderData();
 	}
 
 	// 4G产品状态激活
