@@ -73,18 +73,33 @@ public class DumpDao {
     * @Date: 2019/12/15 
     */ 
     public int dumpMessageOrderInfo(String partitionName){
-        String sql = "insert into MESSAGE_ORDER_INFO_STG  select * from message_order_info   partition("+partitionName+")  where id in ( " +
-                "select mo.id from message_order mo where mo.id in (  select id from MESSAGE_ORDER_info   partition("+partitionName+") ) and mo.process_state = 'C2' )";
+        String sql = "insert into MESSAGE_ORDER_INFO_STG " +
+                " select * from message_order_info moi where moi.id in (   " +
+                " select id from " +
+                "(select id,process_state  from message_order_stg  union all select id,process_state  from message_order ) " +
+                " where id in ( select id from MESSAGE_ORDER_info   partition("+partitionName+")) and process_state = 'C2' )" ;
         return saopJdbcTemplate.update(sql);
     }
 
     public int delMessageOrderInfo(String partitionName){
-        String sql = "delete from MESSAGE_ORDER_info moi where moi.id in ( " +
-                "select id from MESSAGE_ORDER_info   partition(SYS_P10604)  where id in (" +
-                " select mo.id from message_order mo where mo.id in (" +
-                " select id from MESSAGE_ORDER_info   partition(SYS_P10604) " +
-                " ) and mo.process_state = 'C2'))";
+        String sql = "delete  message_order_info moi where moi.id in (  " +
+                "select id  from " +
+                " (select id,process_state  from message_order_stg  union all select id,process_state  from message_order ) " +
+                " where id in ( select id from MESSAGE_ORDER_info   partition("+partitionName+")) and process_state = 'C2' )" ;
         return saopJdbcTemplate.update(sql);
+    }
+
+
+    /** 
+    * @Description: 删除分区 ，重建索引
+    * @Param: [tableName, partitionName] 
+    * @return: void 
+    * @Author: dong.chao
+    * @Date: 2019/12/15 
+    */ 
+    public void deltePartition(String tableName,String partitionName){
+        String sql = "alter table "+tableName+" drop partition "+partitionName+"   UPDATE GLOBAL INDEXES";
+        saopJdbcTemplate.execute(sql);
     }
 
 

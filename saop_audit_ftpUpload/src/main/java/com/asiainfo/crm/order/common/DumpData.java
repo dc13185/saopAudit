@@ -1,9 +1,12 @@
 package com.asiainfo.crm.order.common;
 
+import com.al.common.utils.DateUtil;
 import com.asiainfo.crm.order.constant.TransferStoreConstant;
 import com.asiainfo.crm.order.dao.DumpDao;
 import com.asiainfo.crm.order.domain.DumpConfig;
 import com.asiainfo.crm.order.domain.PartitionEntity;
+import com.asiainfo.crm.order.util.FlieUtils;
+import com.asiainfo.crm.order.util.PropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +44,9 @@ public class DumpData {
               if(TransferStoreConstant.getDumpDataTables().contains(table)){
                   //如果table需要转储，就进行转储
                   dumpDataMethod(table,partitonNames);
-
+              }else{
+                  //不需要转储的 直接删除分区
+                  deleteDataMethod(table,partitonNames);
               }
           }
 
@@ -95,22 +100,37 @@ public class DumpData {
     * @Date: 2019/12/13
     */
     public void dumpDataMethod(String tableName,List<String> partitonNames){
+        String logFile = PropertiesUtil.getProperty("logFile");
+        String logPath = PropertiesUtil.getProperty("logPath");
+        String format = DateUtil.getNow(DateUtil.DATE_FORMATE_STRING_A)+ ":%s转储分区%s:转储%s条数据,删除%s条数据";
         //获取历史表
         for (String partitonName : partitonNames) {
+            int i = 0 , y = 0;
             if(tableName.equals(TransferStoreConstant.MESSAGE_ORDER)){
-               int i = dumpDao.dumpMessageOrder(partitonName);
-               int y = dumpDao.delMessageOrder(partitonName);
-               System.out.println("MessageOrder转储"+i+"条数据,删除"+y+"条数据");
+                i = dumpDao.dumpMessageOrder(partitonName);
+                y = dumpDao.delMessageOrder(partitonName);
             }else if(tableName.equals(TransferStoreConstant.MESSAGE_ORDER_INFO)){
-                int i = dumpDao.dumpMessageOrderInfo(partitonName);
-               // int y = dumpDao.delMessageOrderInfo(partitonName);
-            }else if(tableName.equals(TransferStoreConstant.TRANSACT_LOG)){
-
-            }else if(tableName.equals(TransferStoreConstant.TRANSACT_LOG_INFO)){
-
+                i = dumpDao.dumpMessageOrderInfo(partitonName);
+                y = dumpDao.delMessageOrderInfo(partitonName);
             }
+            String str =  String.format(format,tableName,partitonName,i,y);
+            //FlieUtils.saveAsFileWriter(logPath+logFile,str);
         }
 
+
+    }
+
+
+    public void deleteDataMethod(String table,List<String> partitonNames){
+        String logFile = PropertiesUtil.getProperty("logFile");
+        String logPath = PropertiesUtil.getProperty("logPath");
+        String format = DateUtil.getNow(DateUtil.DATE_FORMATE_STRING_A)+ ":%s删除分区%s";
+        //直接删除分区
+        for (String partitonName : partitonNames) {
+            String str = String.format(format,table,partitonName);
+            dumpDao.deltePartition(table,partitonName);
+            FlieUtils.saveAsFileWriter(logPath+logFile,str);
+        }
 
     }
 

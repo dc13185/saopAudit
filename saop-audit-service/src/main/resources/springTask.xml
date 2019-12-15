@@ -62,6 +62,18 @@
 		<!--<task:scheduled ref="ftpUploadTask" method="refreshListenAudit" cron="0 0/15 * * * ?" />-->
 		<!-- ftp上传定时任务 -->
 
-		<task:scheduled ref="ftpUploadTask" method="finalReport" cron="0 0 0,3,7,12,14,16,18,21 * * ?" />
+		<!-- 查找未报竣的进行报竣每天(2小时一次) -->
+		<task:scheduled ref="ftpUploadTask" method="finalReport" cron="0 0 0/2 * * ?" />
+
+		<!-- 转储，每天(0点ban) -->
+		<task:scheduled ref="ftpUploadTask" method="temporary" cron="0 30 0 * * ?" />
+
+		<!-- 处理堵单(3小时一次) -->
+		<task:scheduled ref="ftpUploadTask" method="messageOrderTimingProcessing" cron="0 0 0/3 * * ?" />
+
+
+
+
+
 	</task:scheduled-tasks>
 </beans>

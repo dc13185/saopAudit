@@ -2,10 +2,15 @@ package com.asiainfo.crm.order.common;
 
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.crm.ftp.common.DateUtil;
+import com.asiainfo.crm.order.constant.RegularConstant;
+import com.asiainfo.crm.order.constant.SqlConstant;
+import com.asiainfo.crm.order.constant.TransferStoreConstant;
+import com.asiainfo.crm.order.constant.UrlConstant;
 import com.asiainfo.crm.order.dao.MessageOrderDao;
 import com.asiainfo.crm.order.util.FlieUtils;
 import com.asiainfo.crm.order.util.HttpRemoteCallClient;
 import com.asiainfo.crm.order.util.PropertiesUtil;
+import com.asiainfo.crm.order.util.StringTools;
 import com.ctc.wstx.util.DataUtil;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -16,8 +21,11 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.sql.Clob;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -32,7 +40,14 @@ public class MessageOrderHandle {
 
     @Autowired
     private MessageOrderDao messageOrderDao;
-
+    
+    /** 
+    * @Description: 定时处理C1没有报竣的单子
+    * @Param: [] 
+    * @return: void 
+    * @Author: dong.chao
+    * @Date: 2019/12/15 
+    */ 
     public void finalReport() throws Exception {
         List<Map<String, Object>> messageOrderIds = messageOrderDao.qryMessageOrderIdByState("C1");
         StringBuilder custOrderId = new StringBuilder();
@@ -54,6 +69,90 @@ public class MessageOrderHandle {
 
     }
 
+    
+    /** 
+    * @Description: 定时处理堵单、E1状态订单、需要异常报竣订单
+    * @Param: [] 
+    * @return: void 
+    * @Author: dong.chao
+    * @Date: 2019/12/15 
+    */ 
+    public void messageOrderTimingProcessing(){
+        //处理在途
+        messageOrderDao.execute(SqlConstant.WALL_ORDER_SQL);
+        //处理E1
+        messageOrderDao.execute(SqlConstant.ON_WAY_ORDER_SQL);
+    }
+
+
+    /**
+     * @Description: 处理被拦截订单
+     * @Param: []
+     * @return: void
+     * @Author: dong.chao
+     * @Date: 2019/12/15
+     */
+    public void interceptMessageOrder() throws Exception {
+        List<Map<String, Object>> messageOrders = messageOrderDao.qryInterceptMessageOrder();
+        for (Map<String, Object> stringObjectMap : messageOrders) {
+            String result = (String) stringObjectMap.get("PROCESS_RESULT");
+            String id = (String) stringObjectMap.get("ID");
+            if (result.contains("互斥")) {
+                //查出message_order
+                Map messageOrderInfo = messageOrderDao.qryMessageOrderInfoById(id);
+                String inParamMsg = StringTools.clobToString((Clob)messageOrderInfo.get("INCEPT_MSG"));
+                //先进行异常报竣
+                dealOneFeeBack(messageOrderInfo,stringObjectMap);
+                //主套餐 可选包
+                String mainOfferName = "" ,mainOfferNameStr="", offerName = "" ,offerNameStr = "";
+                Matcher matcher = RegularConstant.QRY_OFFER_NAME_PATTERN.matcher(result);
+                if(matcher.find()){
+                    offerNameStr = matcher.group(0).replaceAll("可选包\\[","").replaceAll("]与","");
+                    offerName = offerNameStr.substring(0,offerNameStr.length()/2);
+                }
+                matcher = RegularConstant.QRY_MAIN_OFFER_NAME_PATTERN.matcher(result);
+                if(matcher.find()){
+                    mainOfferNameStr = matcher.group(0).replaceAll("套餐\\[","").replaceAll("]互斥","");
+                    mainOfferName = mainOfferNameStr.substring(0,mainOfferNameStr.length()/2);
+                }
+                //开始查找extOfferId
+                String  offerExtOfferIdRegular = String.format(RegularConstant.INTERCEPTSTRFORMATE,offerName);
+                Pattern offerExtOfferIdPattern = Pattern.compile(offerExtOfferIdRegular);
+                String extOfferId = "",mainExtOfferId = "";
+                //获取截取字符串
+                Matcher offerMatcher = offerExtOfferIdPattern.matcher(inParamMsg);
+                if(offerMatcher.find()){
+                    String interceptStr = offerMatcher.group(0);
+                    extOfferId = org.apache.commons.lang3.StringUtils.substringBetween(interceptStr,"<EXT_PROD_OFFER_ID>", "</EXT_PROD_OFFER_ID>");
+                }
+                //开始查找主套餐extOfferId
+                String  mainOfferExtOfferIdRegular = String.format(RegularConstant.INTERCEPTSTRFORMATE,mainOfferName);
+                Pattern mainOfferExtOfferIdPattern = Pattern.compile(mainOfferExtOfferIdRegular);
+                offerMatcher = mainOfferExtOfferIdPattern.matcher(inParamMsg);
+                if(offerMatcher.find()){
+                    String interceptStr = offerMatcher.group(0);
+                    mainExtOfferId = org.apache.commons.lang3.StringUtils.substringBetween(interceptStr,"<EXT_PROD_OFFER_ID>", "</EXT_PROD_OFFER_ID>");
+                }
+
+
+
+            }
+
+
+        }
+    }
+
+
+
+
+
+    /** 
+    * @Description: 送集团报竣
+    * @Param: [custOrderId] 
+    * @return: void 
+    * @Author: dong.chao
+    * @Date: 2019/12/15 
+    */ 
     public void freeBackOnError(String custOrderId) throws Exception {
         String traceId = inTraceIdSaop(custOrderId);
         if(StringUtils.isEmpty(traceId)){
@@ -89,7 +188,7 @@ public class MessageOrderHandle {
         saopMsgSB.append("\"traceId\":\"");
         saopMsgSB.append(traceId);
         saopMsgSB.append("\"}}}}");
-        String url = "http://133.0.208.1:9700/saop-service/service/saop_exchange";
+        String url = UrlConstant.SAOP_URL;
         String responseStr = HttpRemoteCallClient.callRemote(url, saopMsgSB.toString(), 0, 0, null, null);
         System.out.println(responseStr);
         String logFile = PropertiesUtil.getProperty("logFile");
@@ -98,8 +197,6 @@ public class MessageOrderHandle {
         String wirtStr="";
         if(responseStr.contains("撤单")){
              wirtStr =  nowTime+" 订单:"+custOrderId+"已被撤单，请进行异常报竣\r";
-        }else{
-             wirtStr =  nowTime+" 订单:"+custOrderId+"已报竣，请进行异常报竣\r";
         }
         FlieUtils.saveAsFileWriter(logPath+logFile,wirtStr);
     }
@@ -111,7 +208,7 @@ public class MessageOrderHandle {
         List<Object> reuls = new ArrayList<>();
         reul.put("busiSign", Long.parseLong(custOrderId));
         reuls.add(reul);
-        String url = "http://133.0.208.1:9700/flowlog-service/service/mon_flow-log_queryTraceIdByCustOrderId";
+        String url = UrlConstant.ENDTODEN_URL;
         try {
             String responseStr = HttpRemoteCallClient.callRemote(url, JSONObject.toJSONString(reuls), 0, 0, null, null);
             if (responseStr == null || !responseStr.contains("resultCode")) {
@@ -131,6 +228,70 @@ public class MessageOrderHandle {
         }
 
     }
+
+
+
+
+    /**
+    * @Description: 进行异常报竣
+    * @Param: [messageOrderInfo, messageOrder]
+    * @return: boolean
+    * @Author: dong.chao
+    * @Date: 2019/12/15
+    */
+    private boolean dealOneFeeBack(Map messageOrderInfo,Map messageOrder) throws Exception {
+        String inParamMsg = StringTools.clobToString((Clob)messageOrderInfo.get("INCEPT_MSG"));
+        String massageOrderId = (String)messageOrder.get("ID");
+        String processResult = (String)messageOrder.get("PROCESS_RESULT");
+        String transactionId = (String)messageOrder.get("TRANSACTION_ID");
+        String olId = (String)messageOrder.get("OL_ID");
+        //异常报竣，如果olId不为空的，需要先制空
+        if (StringUtils.isNotEmpty(olId)){
+            String sql = "update message_order mo set mo.ol_id = '' where mo.id = '"+olId+"' ";
+            messageOrderDao.execute(sql);
+        }
+        // 拼接报文(将远来的ServiceCode中替换为SVC-YCBJ)
+        String regular = "<ServiceCode>[0-9a-zA-Z]{8}</ServiceCode>";
+        String requestStr = inParamMsg.replaceAll(regular,"<ServiceCode>SVC-YCBJ</ServiceCode>");
+        // 请求异常报竣请求
+        String result = HttpRemoteCallClient.callRemote(UrlConstant.SAOP_URL, requestStr, 0, 0, null, null);
+        if (org.apache.commons.lang.StringUtils.isEmpty(result)) {
+            System.out.println("调用saop异常报竣返回报文为空");
+            return false;
+        }
+        Map<String, Object> transactInfo = new HashMap<>();
+        transactInfo.put("transacstionId",transactionId);
+        if (result.contains("<RspCode>0000</RspCode>")){
+            //调用成功 修改mssageOrder 状态
+            Matcher mat = TransferStoreConstant.CODE_PATTERN.matcher(result);
+            String  resultMsg = "";
+            while (mat.find()) {
+                resultMsg = mat.group(0);
+            }
+            resultMsg = "异常报竣：" + resultMsg+"。原始处理结果："+processResult;
+            if (resultMsg.length() > 2000){
+                resultMsg = resultMsg.substring(0,1999);
+            }
+            transactInfo.put("processResult",resultMsg);
+            transactInfo.put("massageOrderId",massageOrderId);
+            //异常报竣成功
+            transactInfo.put("processState", "C2");
+            //修改massage_order 状态
+            messageOrderDao.updMessageOrderByFeeBack(transactInfo);
+            //删除listen_massage_order记录转储到 历史表
+            int m =messageOrderDao.insertListenMessageOrderHis(massageOrderId);
+            if (m > 0){
+                messageOrderDao.deleteListenMessageOrder(massageOrderId);
+            }
+        }else{
+            //异常报竣失败
+            System.out.println("调用报竣接口接口异常，返回结果为:"+result+"");
+            return false;
+        }
+        return true;
+
+    }
+
 
 
 

@@ -74,7 +74,12 @@ public class Jobs {
 		dumpData.dumpMessageOrderData();
 	}
 
-	// 4G产品状态激活
+    public void messageOrderTimingProcessing () throws Exception {
+        messageOrderHandle.messageOrderTimingProcessing();
+    }
+
+
+    // 4G产品状态激活
 	public void prodActivationAudit4G() {
 		saopFtpSmo.execute("BUS60018");
 	}

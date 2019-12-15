@@ -2,6 +2,7 @@ package com.asiainfo.crm.order.constant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author: dong.chao
@@ -102,9 +103,13 @@ public class TransferStoreConstant {
     // 主表每次最多提交数
     public static final int INFO_TABLE_PRE_COMMIT = 100;
 
+
     public static List<String>  dumpDataTables;
 
     public static List<String>  allDataTables;
+
+    /** 预编译正则 */
+    public static   Pattern CODE_PATTERN = Pattern.compile("<Response>[\\w\\W]*</Response>");
 
     public static List<String> getDumpDataTables(){
         if( dumpDataTables == null){
