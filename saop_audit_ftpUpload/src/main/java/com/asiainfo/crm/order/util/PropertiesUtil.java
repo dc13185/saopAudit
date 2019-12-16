@@ -16,18 +16,14 @@ import java.util.Properties;
 public class PropertiesUtil {
 
     private static Logger logger = LoggerFactory.getLogger(PropertiesUtil.class);
-    //private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static Properties props;
 
-    //Tomcat运行时执行
-    //代码块执行顺序：静态代码块>普通代码块>构造代码块
-    //构造代码块每次都执行，但是静态代码块只执行一次
     static {
         String fileName = "dataSource.properties";
         props = new Properties();
         try {
-            props.load(new InputStreamReader(PropertiesUtil.class.getClassLoader().getResourceAsStream(fileName),"UTF-8"));
+            props.load(new InputStreamReader(PropertiesUtil.class.getClassLoader().getResourceAsStream(fileName),"GBK"));
         } catch (IOException e) {
             logger.error("配置文件读取异常",e);
         }

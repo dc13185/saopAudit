@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author: dong.chao
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @description: 稽核SAOP
  **/
 
-@Component
+@Repository
 public class AuditDao {
 
     @Autowired

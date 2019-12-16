@@ -102,7 +102,7 @@ public class DumpData {
     public void dumpDataMethod(String tableName,List<String> partitonNames){
         String logFile = PropertiesUtil.getProperty("logFile");
         String logPath = PropertiesUtil.getProperty("logPath");
-        String format = DateUtil.getNow(DateUtil.DATE_FORMATE_STRING_A)+ ":%s转储分区%s:转储%s条数据,删除%s条数据";
+        String format = DateUtil.getNow(DateUtil.DATE_FORMATE_STRING_A)+ ":%s转储分区%s:转储%s条数据,删除%s条数据\r";
         //获取历史表
         for (String partitonName : partitonNames) {
             int i = 0 , y = 0;
@@ -114,7 +114,7 @@ public class DumpData {
                 y = dumpDao.delMessageOrderInfo(partitonName);
             }
             String str =  String.format(format,tableName,partitonName,i,y);
-            //FlieUtils.saveAsFileWriter(logPath+logFile,str);
+            FlieUtils.saveAsFileWriter(logPath+logFile,str);
         }
 
 
@@ -124,7 +124,7 @@ public class DumpData {
     public void deleteDataMethod(String table,List<String> partitonNames){
         String logFile = PropertiesUtil.getProperty("logFile");
         String logPath = PropertiesUtil.getProperty("logPath");
-        String format = DateUtil.getNow(DateUtil.DATE_FORMATE_STRING_A)+ ":%s删除分区%s";
+        String format = DateUtil.getNow(DateUtil.DATE_FORMATE_STRING_A)+ ":%s删除分区%s\r";
         //直接删除分区
         for (String partitonName : partitonNames) {
             String str = String.format(format,table,partitonName);

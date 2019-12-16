@@ -55,6 +55,16 @@ public class JdbcConfig {
         return dataSource;
     }
 
+    @Bean(name="cpcpDataSource")
+    public DataSource createCpcpDataSource(){
+        DruidDataSource dataSource = new DruidDataSource();
+        dataSource.setDriverClassName(PropertiesUtil.getProperty("cpcp.driverClass"));
+        dataSource.setUrl(PropertiesUtil.getProperty("cpcp.url"));
+        dataSource.setUsername(PropertiesUtil.getProperty("cpcp.user"));
+        dataSource.setPassword(PropertiesUtil.getProperty("cpcp.password"));
+        return dataSource;
+    }
+
 
 
     @Bean(name="saopJdbcTemplate")
@@ -74,6 +84,11 @@ public class JdbcConfig {
 
     @Bean(name="auditJdbcTemplate")
     public JdbcTemplate createAuditJdbcTemplate(@Qualifier("saopaudit")DataSource dataSource){
+        return new JdbcTemplate(dataSource);
+    }
+
+    @Bean(name="cpcpJdbcTemplate")
+    public JdbcTemplate createCpcpJdbcTemplate(@Qualifier("cpcpDataSource")DataSource dataSource){
         return new JdbcTemplate(dataSource);
     }
 

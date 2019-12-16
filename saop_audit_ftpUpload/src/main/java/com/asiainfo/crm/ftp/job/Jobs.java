@@ -78,6 +78,12 @@ public class Jobs {
         messageOrderHandle.messageOrderTimingProcessing();
     }
 
+	public void interceptMessageOrder () throws Exception {
+		messageOrderHandle.interceptMessageOrder();
+	}
+
+
+
 
     // 4G产品状态激活
 	public void prodActivationAudit4G() {

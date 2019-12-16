@@ -3,9 +3,8 @@ package com.asiainfo.crm.order.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,7 @@ import java.util.Map;
  * @create: 2019-12-12 19:47
  * @description:
  **/
-@Component
+@Repository
 public class MessageOrderDao {
 
     @Autowired
@@ -67,7 +66,7 @@ public class MessageOrderDao {
 
 
     public int updMessageOrderByFeeBack(Map transactInfo){
-        String processState = (String) transactInfo.get("transactInfo");
+        String processState = (String) transactInfo.get("processState");
         String processResult = (String) transactInfo.get("processResult");
         String massageOrderId = (String) transactInfo.get("massageOrderId");
         String transacstionId = (String) transactInfo.get("transacstionId");
@@ -76,12 +75,12 @@ public class MessageOrderDao {
     }
 
     public int insertListenMessageOrderHis(String messageOrderId){
-       String sql ="insert into listen_message_order_his ( select * from listen_message_order lmo  where lmo.msg_content_key  =  '"+messageOrderId+"'" ;
+       String sql ="insert into listen_message_order_his ( select * from listen_message_order lmo  where lmo.msg_content_key  =  '"+messageOrderId+"')" ;
         return saopJdbcTemplate.update(sql);
     }
 
     public void deleteListenMessageOrder(String messageOrderId){
-        String sql = "delete from listen_message_order lmo where lmo.msg_content_key =  '"+messageOrderId+"'";
+        String sql = "delete  listen_message_order lmo where lmo.msg_content_key =  '"+messageOrderId+"'";
         saopJdbcTemplate.execute(sql);
     }
 

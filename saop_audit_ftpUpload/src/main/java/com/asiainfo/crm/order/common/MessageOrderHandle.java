@@ -1,27 +1,29 @@
 package com.asiainfo.crm.order.common;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.crm.ftp.common.DateUtil;
 import com.asiainfo.crm.order.constant.RegularConstant;
 import com.asiainfo.crm.order.constant.SqlConstant;
 import com.asiainfo.crm.order.constant.TransferStoreConstant;
 import com.asiainfo.crm.order.constant.UrlConstant;
+import com.asiainfo.crm.order.dao.CodeMappingDao;
+import com.asiainfo.crm.order.dao.CpcpDao;
 import com.asiainfo.crm.order.dao.MessageOrderDao;
+import com.asiainfo.crm.order.dao.RuleDao;
 import com.asiainfo.crm.order.util.FlieUtils;
 import com.asiainfo.crm.order.util.HttpRemoteCallClient;
 import com.asiainfo.crm.order.util.PropertiesUtil;
 import com.asiainfo.crm.order.util.StringTools;
-import com.ctc.wstx.util.DataUtil;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -40,6 +42,18 @@ public class MessageOrderHandle {
 
     @Autowired
     private MessageOrderDao messageOrderDao;
+
+    @Autowired
+    private CodeMappingDao codeMappingDao;
+
+    @Autowired
+    private CpcpDao cpcpDao;
+
+    @Autowired
+    private RuleDao ruleDao;
+
+    String logFile = PropertiesUtil.getProperty("logFile");
+    String logPath = PropertiesUtil.getProperty("logPath");
     
     /** 
     * @Description: 定时处理C1没有报竣的单子
@@ -96,11 +110,11 @@ public class MessageOrderHandle {
         List<Map<String, Object>> messageOrders = messageOrderDao.qryInterceptMessageOrder();
         for (Map<String, Object> stringObjectMap : messageOrders) {
             String result = (String) stringObjectMap.get("PROCESS_RESULT");
-            String id = (String) stringObjectMap.get("ID");
+            String id = ((BigDecimal) stringObjectMap.get("ID")).toString();
             if (result.contains("互斥")) {
                 //查出message_order
                 Map messageOrderInfo = messageOrderDao.qryMessageOrderInfoById(id);
-                String inParamMsg = StringTools.clobToString((Clob)messageOrderInfo.get("INCEPT_MSG"));
+                String inParamMsg = (String)messageOrderInfo.get("INCEPT_MSG");
                 //先进行异常报竣
                 dealOneFeeBack(messageOrderInfo,stringObjectMap);
                 //主套餐 可选包
@@ -133,12 +147,42 @@ public class MessageOrderHandle {
                     String interceptStr = offerMatcher.group(0);
                     mainExtOfferId = org.apache.commons.lang3.StringUtils.substringBetween(interceptStr,"<EXT_PROD_OFFER_ID>", "</EXT_PROD_OFFER_ID>");
                 }
+                //定义出可选包id和主套餐id
+                String offerId = "", mainOfferId = "";
+                if(StringUtils.isNotBlank(extOfferId)){
+                    offerId = codeMappingDao.qryCodeMappingByHocde(extOfferId);
+                }else {
+                    offerId = getOfferId(offerNameStr,inParamMsg);
+                }
+                if(StringUtils.isNotBlank(mainOfferId)){
+                    mainOfferId = codeMappingDao.qryCodeMappingByHocde(mainExtOfferId);
+                }else{
+                    mainOfferId = getOfferId(mainOfferNameStr,inParamMsg);
+                }
 
-
-
+                //开始往规则库中差入数据
+                if (StringUtils.isNotBlank(offerId) && StringUtils.isNotBlank(mainOfferId)) {
+                    //往规则库插数据
+                    String mainOfferStrList = ruleDao.qryMainOffers(offerId);
+                    if (StringUtils.isNotEmpty(mainOfferStrList)) {
+                        //如果没有的话，进行补充
+                        if (!mainOfferStrList.contains(mainOfferId)) {
+                            mainOfferStrList = mainOfferStrList + "," + mainOfferId;
+                            ruleDao.updateRule(mainOfferStrList, offerId);
+                            String str = "规则库添加可选包配置offerName:"+offerNameStr+" offerId:"+offerId+"与主套餐offerName:"+mainOfferNameStr+" offerId:"+mainOfferId+"\r" ;
+                            System.out.println(str);
+                            FlieUtils.saveAsFileWriter(logPath+logFile,str);
+                        }
+                    }else {
+                        String idStr = ruleDao.getRuleByLastId();
+                        int ruleId = Integer.parseInt(idStr);
+                        ruleDao.insertRule(ruleId,offerId,offerNameStr,mainOfferId);
+                        String str = "规则库添加可选包配置offerName:"+offerNameStr+" offerId:"+offerId+"与主套餐offerName:"+mainOfferNameStr+" offerId:"+mainOfferId+"\r" ;
+                        System.out.println(str);
+                        FlieUtils.saveAsFileWriter(logPath+logFile,str);
+                    }
+                }
             }
-
-
         }
     }
 
@@ -191,8 +235,6 @@ public class MessageOrderHandle {
         String url = UrlConstant.SAOP_URL;
         String responseStr = HttpRemoteCallClient.callRemote(url, saopMsgSB.toString(), 0, 0, null, null);
         System.out.println(responseStr);
-        String logFile = PropertiesUtil.getProperty("logFile");
-        String logPath = PropertiesUtil.getProperty("logPath");
         String nowTime = DateUtil.getNowTime(DateUtil.DATE_FORMATE_STRING_DEFAULT_D);
         String wirtStr="";
         if(responseStr.contains("撤单")){
@@ -240,8 +282,8 @@ public class MessageOrderHandle {
     * @Date: 2019/12/15
     */
     private boolean dealOneFeeBack(Map messageOrderInfo,Map messageOrder) throws Exception {
-        String inParamMsg = StringTools.clobToString((Clob)messageOrderInfo.get("INCEPT_MSG"));
-        String massageOrderId = (String)messageOrder.get("ID");
+        String inParamMsg = (String)messageOrderInfo.get("INCEPT_MSG");
+        String massageOrderId = ((BigDecimal)messageOrder.get("ID")).toString();
         String processResult = (String)messageOrder.get("PROCESS_RESULT");
         String transactionId = (String)messageOrder.get("TRANSACTION_ID");
         String olId = (String)messageOrder.get("OL_ID");
@@ -293,6 +335,53 @@ public class MessageOrderHandle {
     }
 
 
+
+
+    private String getOfferId(String offerName,String inParamMsg){
+        //去查offerId
+        String offerId = backOfferId(offerName, inParamMsg);
+        //查不到，去找特殊配置
+        if(StringUtils.isEmpty(offerId)){
+            String specialOfferNames = PropertiesUtil.getProperty("specialOfferName");
+            if(specialOfferNames.contains(offerName)){
+                JSONArray specialOfferNamesObj = JSONArray.parseArray(specialOfferNames);
+                for (Object specialOfferNameObj : specialOfferNamesObj) {
+                    JSONObject specialOfferName = (JSONObject)specialOfferNameObj;
+                    String specialOfferId = specialOfferName.getString("offerId");
+                    String specialExtOfferId = specialOfferName.getString("extOfferId");
+                    if(specialExtOfferId.contains(specialExtOfferId)){
+                        offerId = specialOfferId;
+                    }
+                }
+            }
+        }
+        return offerId;
+    }
+
+
+    private String backOfferId(String offerName,String inParamMsg){
+        //如果没有查到就需要特殊处理了
+        Map<String,Object> offer = cpcpDao.qryOfferIdbyOfferName(offerName);
+        //找到查出来的省内ID
+        String qryOfferId = ((BigDecimal)offer.get("OFFER_ID")).toString();
+        //找到查出来的省内ID
+        String qryExtOfferId = ((String)offer.get("EXT_OFFER_ID"));
+        if(StringUtils.isNotEmpty(qryExtOfferId) && inParamMsg.contains(qryExtOfferId)){
+            return qryOfferId;
+        }
+        if(StringUtils.isNotEmpty(qryOfferId) && inParamMsg.contains(qryOfferId)){
+            return qryOfferId;
+        }
+        //如果没查到，返回null
+        return null;
+    }
+
+
+    public static void main(String[] args) {
+        String specialOfferNames = PropertiesUtil.getProperty("logFile");
+        JSONArray specialOfferNamesObj = (JSONArray)JSONObject.parse(specialOfferNames);
+        System.out.println();
+    }
 
 
 
