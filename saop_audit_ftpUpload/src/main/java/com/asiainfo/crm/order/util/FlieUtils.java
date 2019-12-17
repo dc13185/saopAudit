@@ -25,6 +25,8 @@ public class FlieUtils {
                 fos.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
+            }finally {
+                return;
             }
         }
     }
