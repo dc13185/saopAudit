@@ -41,19 +41,24 @@ public class MessageOrderDao {
     }
 
 
+    public  Map<String, Object> qyrMessageOrderByOlId(String custOrderId){
+        String sql = "select * from message_order mo where mo.ol_id = '"+custOrderId+"'";
+        return saopJdbcTemplate.queryForMap(sql);
+    }
+
 
     public void execute(String sql){
         saopJdbcTemplate.execute(sql);
     }
 
-    
-    /** 
-    * @Description: 查到所有错单集合
-    * @Param: [] 
-    * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>> 
-    * @Author: dong.chao
-    * @Date: 2019/12/15 
-    */
+
+    /**
+     * @Description: 查到所有错单集合
+     * @Param: []
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: dong.chao
+     * @Date: 2019/12/15
+     */
     public List<Map<String, Object>> qryInterceptMessageOrder(){
         String sql = " select mo.* from message_order mo where mo.Process_State = 'E1' and mo.process_result   like '%互斥%'";
         return saopJdbcTemplate.queryForList(sql);
@@ -75,7 +80,7 @@ public class MessageOrderDao {
     }
 
     public int insertListenMessageOrderHis(String messageOrderId){
-       String sql ="insert into listen_message_order_his ( select * from listen_message_order lmo  where lmo.msg_content_key  =  '"+messageOrderId+"')" ;
+        String sql ="insert into listen_message_order_his ( select * from listen_message_order lmo  where lmo.msg_content_key  =  '"+messageOrderId+"')" ;
         return saopJdbcTemplate.update(sql);
     }
 
