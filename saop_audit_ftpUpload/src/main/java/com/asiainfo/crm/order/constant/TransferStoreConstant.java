@@ -129,6 +129,10 @@ public class TransferStoreConstant {
             allDataTables.add(TRANSACT_LOG_INFO);
             allDataTables.add(TRANSACT_LOG_CHK);
             allDataTables.add(TRANSACT_LOG_CHK_INFO);
+            allDataTables.add(TRANSACT_LOG_QRY);
+            allDataTables.add(TRANSACT_LOG_QRY_INFO);
+            allDataTables.add(INVOKE_URL_LOG);
+            allDataTables.add(INVOKE_URL_LOG_INFO);
         }
         return  allDataTables;
     }

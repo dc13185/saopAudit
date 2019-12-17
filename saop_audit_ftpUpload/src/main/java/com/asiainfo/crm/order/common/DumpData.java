@@ -131,7 +131,9 @@ public class DumpData {
             dumpDao.deltePartition(table,partitonName);
             FlieUtils.saveAsFileWriter(logPath+logFile,str);
         }
-
     }
+
+
+
 
 }
