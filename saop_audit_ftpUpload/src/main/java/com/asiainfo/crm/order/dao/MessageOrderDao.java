@@ -51,6 +51,10 @@ public class MessageOrderDao {
         saopJdbcTemplate.execute(sql);
     }
 
+    public void update(String sql){
+        saopJdbcTemplate.update(sql);
+    }
+
 
     /**
      * @Description: 查到所有错单集合

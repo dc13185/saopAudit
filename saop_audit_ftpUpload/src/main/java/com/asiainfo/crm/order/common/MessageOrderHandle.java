@@ -295,8 +295,8 @@ public class MessageOrderHandle {
             String olId = (String)messageOrder.get("OL_ID");
             //异常报竣，如果olId不为空的，需要先制空
             if (StringUtils.isNotEmpty(olId)){
-                String sql = "update message_order mo set mo.ol_id = '' where mo.id = '"+olId+"' ";
-                messageOrderDao.execute(sql);
+                String sql = "update message_order mo set mo.ol_id = '' where mo.ol_id = '"+olId+"' ";
+                messageOrderDao.update(sql);
             }
             // 拼接报文(将远来的ServiceCode中替换为SVC-YCBJ)
             String regular = "<ServiceCode>[0-9a-zA-Z]{8}</ServiceCode>";

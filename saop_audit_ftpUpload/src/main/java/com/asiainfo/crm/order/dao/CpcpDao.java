@@ -19,8 +19,8 @@ public class CpcpDao {
     @Qualifier("cpcpJdbcTemplate")
     JdbcTemplate cpcpJdbcTemplate;
 
-    public Map<String, Object> qryOfferIdbyOfferName(String offerName){
-        String sql = "select o.OFFER_ID,o.EXT_OFFER_ID from offer o where o.offer_name = '"+offerName+"'";
+    public Map<String, Object> qryOfferIdbyOfferName(String offerName,String offerType){
+        String sql = "select o.OFFER_ID,o.EXT_OFFER_ID from offer o where o.offer_name = '"+offerName+"' and offer_type = '"+offerType+"' limit 1";
         return cpcpJdbcTemplate.queryForMap(sql);
 
     }
