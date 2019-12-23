@@ -149,12 +149,12 @@ public class MessageOrderHandle {
                 if(StringUtils.isNotBlank(extOfferId)){
                     offerId = codeMappingDao.qryCodeMappingByHocde(extOfferId);
                 }else {
-                    offerId = getOfferId(offerNameStr,inParamMsg);
+                    offerId = getOfferId(offerNameStr,inParamMsg,"12");
                 }
                 if(StringUtils.isNotBlank(mainOfferId)){
                     mainOfferId = codeMappingDao.qryCodeMappingByHocde(mainExtOfferId);
                 }else{
-                    mainOfferId = getOfferId(mainOfferNameStr,inParamMsg);
+                    mainOfferId = getOfferId(mainOfferNameStr,inParamMsg,"11");
                 }
 
                 //开始往规则库中差入数据
@@ -347,9 +347,9 @@ public class MessageOrderHandle {
 
 
 
-    private String getOfferId(String offerName,String inParamMsg){
+    private String getOfferId(String offerName,String inParamMsg,String offerType){
         //去查offerId
-        String offerId = backOfferId(offerName, inParamMsg);
+        String offerId = backOfferId(offerName, inParamMsg,offerType);
         //查不到，去找特殊配置
         if(StringUtils.isEmpty(offerId)){
             String specialOfferNames = PropertiesUtil.getProperty("specialOfferName");
@@ -369,9 +369,9 @@ public class MessageOrderHandle {
     }
 
 
-    private String backOfferId(String offerName,String inParamMsg){
+    private String backOfferId(String offerName,String inParamMsg,String offerType){
         //如果没有查到就需要特殊处理了
-        Map<String,Object> offer = cpcpDao.qryOfferIdbyOfferName(offerName);
+        Map<String,Object> offer = cpcpDao.qryOfferIdbyOfferName(offerName,offerType);
         //找到查出来的省内ID
         String qryOfferId = ((BigDecimal)offer.get("OFFER_ID")).toString();
         //找到查出来的省内ID
