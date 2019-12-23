@@ -71,8 +71,8 @@
 		<!-- 处理堵单(3小时一次) -->
 		<task:scheduled ref="ftpUploadTask" method="messageOrderTimingProcessing" cron="0 0 0/3 * * ?" />
 
-		<!-- 处理动作链拦截的(3小时一次) -->
-		<task:scheduled ref="ftpUploadTask" method="interceptMessageOrder" cron="0 0 0/2 * * ?" />
+		<!-- 处理动作链拦截的(2小时一次) -->
+		<task:scheduled ref="ftpUploadTask" method="interceptMessageOrder" cron="0 0/2 * * * ?" />
 
 
 
