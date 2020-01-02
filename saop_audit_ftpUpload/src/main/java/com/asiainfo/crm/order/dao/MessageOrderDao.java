@@ -1,10 +1,13 @@
 package com.asiainfo.crm.order.dao;
 
+import com.al.common.utils.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +28,7 @@ public class MessageOrderDao {
     JdbcTemplate soJdbcTemplate;
 
     public List<Map<String, Object>>  qryMessageOrderIdByState(String state) {
-        String sql = "select mo.ol_id from message_order mo where mo.process_state = ? ";
+        String sql = "select mo.ol_id from message_order mo where mo.process_state = ?  ";
         return saopJdbcTemplate.queryForList(sql,new Object[]{state});
     }
 
@@ -93,4 +96,77 @@ public class MessageOrderDao {
         saopJdbcTemplate.execute(sql);
     }
 
+
+    public List<Map<String, Object>> qyrErrorMessageOrder(){
+        String sql = "select mo.transaction_id,mo.ol_id from message_order mo where mo.process_state = 'E2' and mo.process_result like '%未竣工%'  and mo.process_result like '%未竣工%'";
+        return saopJdbcTemplate.queryForList(sql);
+    }
+
+    public void insertLog(String customerOrderId,String transactionId,String log){
+        if(StringUtils.isBlank(customerOrderId)){
+            customerOrderId = "";
+        }
+        if(StringUtils.isBlank(transactionId)){
+            transactionId = "";
+        }
+        String nowDate = DateUtil.getNow(DateUtil.DATE_FORMATE_STRING_A);
+        String sql = "insert into temp_ycfreeback_data_log(cust_order_id,transaction_id,log,create_date) values ('"+customerOrderId+"','"+transactionId+"','"+log+"',to_date('"+nowDate+"','yyyy-mm-dd hh24:mi:ss'))";
+        saopJdbcTemplate.update(sql);
+    }
+
+
+    public List<Map<String, Object>> qryErrorMessageOrderInfo(){
+        String sql = "select mo.*,moi.incept_msg from message_order mo left join message_order_info moi on mo.id = moi.id where mo.process_result like '%NullPointerException%' and mo.process_state = 'E1'";
+        return saopJdbcTemplate.queryForList(sql);
+    }
+
+
+    public String qryPcodeByHcode(String assistExtOfferId) {
+        String sql = "select cm.p_code from code_mapping cm where cm.h_code = '"+assistExtOfferId+"' and cm.map_domain = 'PROD_OFFER.EXT_OFFER_NBR' and rownum = 1";
+        return saopJdbcTemplate.queryForObject(sql,String.class);
+    }
+
+    public void updateMessageOrderTemp(String customerOrderId,String messageOrderId ) {
+        String sql = " update   message_order mo   set mo.ol_id = '"+customerOrderId+"' , mo.process_state = 'C1' ,  mo.process_result = '成功' where mo.id = '"+messageOrderId+"'";
+        saopJdbcTemplate.update(sql);
+    }
+
+
+    public void qryWrongOrder(){
+        String sql = "select mo.ext_cust_order_id from message_order mo where mo.process_state = 'E1' and  mo.process_result like '%未归档%'";
+        List<Map<String, Object>>  custOrderIds =  saopJdbcTemplate.queryForList(sql);
+        StringBuffer str = new StringBuffer();
+        for (int i = 0; i < custOrderIds.size(); i++) {
+            String custOrderId = (String)custOrderIds.get(i).get("EXT_CUST_ORDER_ID");
+            if(i != custOrderIds.size()-1){
+                str.append("'").append(custOrderId).append("',");
+            }else{
+                str.append("'").append(custOrderId).append("'");
+            }
+        }
+        String fackMessageSql = "select c.ext_cust_order_id,c.status_cd from customer_order c  where c.ext_cust_order_id in ("+str.toString()+") ";
+        List<Map<String, Object>>  customOrders =  soJdbcTemplate.queryForList(fackMessageSql);
+        StringBuffer hdStr = new StringBuffer();
+        for (int i = 0; i < customOrders.size(); i++) {
+            String custOrderId = (String)customOrders.get(i).get("EXT_CUST_ORDER_ID");
+            if(i != customOrders.size()-1){
+                hdStr.append("'").append(custOrderId).append("',");
+            }else{
+                hdStr.append("'").append(custOrderId).append("'");
+            }
+        }
+        if (StringUtils.isNotBlank(hdStr.toString())){
+            String exeSql = "begin\n" +
+                    "  for rec in (\n" +
+                    "     select * from message_order mo where  mo.ext_cust_order_id in ('') and  mo.process_state = 'E1' \n" +
+                    "    ) loop\n" +
+                    "    update message_order mo SET mo.process_state = 'W' where mo.id = rec.id;\n" +
+                    "    update listen_message_order lmo set lmo.deal_flag = 'D' where  lmo.msg_content_key = rec.id;\n" +
+                    "end loop;       \n" +
+                    "end;";
+
+            saopJdbcTemplate.execute(exeSql);
+        }
+
+    }
 }

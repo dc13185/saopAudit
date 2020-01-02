@@ -14,6 +14,7 @@ import com.asiainfo.crm.order.dao.RuleDao;
 import com.asiainfo.crm.order.util.FlieUtils;
 import com.asiainfo.crm.order.util.HttpRemoteCallClient;
 import com.asiainfo.crm.order.util.PropertiesUtil;
+import com.asiainfo.crm.order.util.StringTools;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.sql.Clob;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -385,6 +387,131 @@ public class MessageOrderHandle {
         //如果没查到，返回null
         return null;
     }
+
+
+    /** 
+    * @Description: 强制竣工一批单子
+    * @Param: [] 
+    * @return: void 
+    * @Author: dong.chao
+    * @Date: 2019/12/30 
+    */ 
+    public void forceCompleted() throws Exception {
+        List<Map<String, Object>> messageOrders = messageOrderDao.qyrErrorMessageOrder();
+        for (Map<String, Object> messageOrder : messageOrders) {
+            String  customerOrderId =  (String)messageOrder.get("OL_ID");
+            String  transactionId =  (String)messageOrder.get("TRANSACTION_ID");
+            String requestStr = "<manualFeedBack><orderInfo><transactionId>"+transactionId+"</transactionId></orderInfo></manualFeedBack>";
+            String url = UrlConstant.SAOP_URL;
+            String responseStr = HttpRemoteCallClient.callRemote(url, requestStr, 0, 0, null, null);
+            if (responseStr.contains("成功")){
+                String str = "订单流水"+transactionId+"已进行强制报竣，原始情况为:报竣环节处理失败！环节：8，错误信息：调受理查询报竣信息失败，存在未竣工的集团订单项!";
+                messageOrderDao.insertLog(customerOrderId,transactionId,str);
+            }
+        }
+        //重新触发合单的
+        useOrderFeedback();
+    }
+
+
+    /**
+     * @Description: 重新触发合单
+     * @Param: []
+     * @return: void
+     * @Author: dong.chao
+     * @Date: 2019/11/12
+     */
+    public void useOrderFeedback() throws Exception {
+        List<Map<String, Object>> errorMessageOrderInfos =  messageOrderDao.qryErrorMessageOrderInfo();
+        for (Map<String, Object> errorMessageOrderInfo : errorMessageOrderInfos) {
+            String infoStr = (String)errorMessageOrderInfo.get("INCEPT_MSG");
+            if(infoStr.contains("getProdOfferInstIdByAccNbr")){
+                continue;
+            }
+            //拿这个去调转换模板
+            infoStr = infoStr
+                    .replaceAll("\"","\'").replaceAll("\n","")
+                    .replaceAll("134146789","134146977")
+                    .replaceAll("134146791","134146981")
+                    .replaceAll("134146794","134146987")
+                    .replaceAll("134146788","134146980")
+                    .replaceAll("134146792","134146985")
+
+            ;
+            String format = "[\"%s\",\"0600000015\",\"\",\"false\"]";
+            //格式化入参
+            String reqStr = String.format(format,infoStr);
+            String resultStr = HttpRemoteCallClient.callRemote("http://133.0.208.1:9700/saop-service/service/saop_test_messageConvertEngine", reqStr, 0, 0, null, null);
+            //返回格式化，修正出参，调合单接口
+            JSONObject resultObj = JSONObject.parseObject(resultStr);
+            JSONObject customerOrder = resultObj.getJSONObject("requestObject").getJSONObject("customerOrder");
+            //isale流水
+            String isaleNbr = customerOrder.getString("isaleNbr");
+            JSONArray offerOrderItems = customerOrder.getJSONArray("offerOrderItems");
+            //循环
+            for (Object offerOrderItemObj : offerOrderItems) {
+                JSONObject offerOrderItem = (JSONObject)offerOrderItemObj;
+                //处理 ordOfferProdInstRels
+                JSONArray ordOfferProdInstRels = offerOrderItem.getJSONArray("ordOfferProdInstRels");
+                JSONArray ordOfferProdInstRelsClone = (JSONArray)ordOfferProdInstRels.clone();
+                for (Object ordOfferProdInstRelObj : ordOfferProdInstRelsClone) {
+                    JSONObject ordOfferProdInstRel = (JSONObject)ordOfferProdInstRelObj;
+                    String prodId = ordOfferProdInstRel.getString("prodId");
+                    if (StringUtils.isEmpty(prodId)){
+                        ordOfferProdInstRels.remove(ordOfferProdInstRelObj);
+                    }
+                }
+
+                //处理 ordOfferInst
+                JSONObject ordOfferInst = offerOrderItem.getJSONArray("ordOfferInsts").getJSONObject(0);
+                String offerId = ordOfferInst.getString("offerId");
+                //offerId为空的则为需要修的
+                if(!StringUtils.isEmpty(offerId)){
+                    continue;
+                }
+                // 看这个值去 Code_mapping表去找 不存在说明 这个销售品没有了
+                String assistExtOfferId = ordOfferInst.getString("assistExtOfferId");
+                String offerName = ordOfferInst.getString("offerName");
+                String pCode = "";
+                try {
+                    pCode = messageOrderDao.qryPcodeByHcode(assistExtOfferId);
+                }catch (Exception e){
+
+                }
+                if(StringUtils.isEmpty(pCode)){
+                    System.out.println("销售品名称["+offerName+"]，编码:"+pCode+"在Code_mapping表中找不到！！！！！");
+                    continue;
+                }
+                //改掉offerId
+                ordOfferInst.put("offerId",pCode);
+            }
+            String feedbackReqStr = resultObj.toJSONString();
+            String responseStr =  HttpRemoteCallClient.callRemote("http://133.0.208.1:9700/so-service/service/so_intf_saveMergeOrder", feedbackReqStr, 0, 0, null, null);
+            JSONObject responseStrObj = JSONObject.parseObject(responseStr);
+            //获取messageOrderId
+            String  customerOrderId = responseStrObj.getJSONObject("resultObject").getString("customerOrderId");
+            String  messageOrderId =  ((BigDecimal)errorMessageOrderInfo.get("ID")).toString();
+            messageOrderDao.updateMessageOrderTemp(customerOrderId,messageOrderId);
+            String transactionId = (String)errorMessageOrderInfo.get("TRANSACTION_ID");
+            String str = "订单"+customerOrderId+"进行重新触发合单";
+            if (responseStr.contains("成功")){
+                messageOrderDao.insertLog(customerOrderId,transactionId,str);
+            }
+        }
+        qryWrongOrder();
+    }
+
+    /**
+    * @Description: 查询状态为E1 但是已经合单过了的
+    * @Param: []
+    * @return: void
+    * @Author: dong.chao
+    * @Date: 2019/12/31
+    */
+    public void qryWrongOrder(){
+       messageOrderDao.qryWrongOrder();
+    }
+
 
 
     public static void main(String[] args) {

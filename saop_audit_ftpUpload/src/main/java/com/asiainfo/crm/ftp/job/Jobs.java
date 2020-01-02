@@ -83,6 +83,11 @@ public class Jobs {
 	}
 
 
+    public void forceCompleted() throws Exception {
+        messageOrderHandle.forceCompleted();
+    }
+
+
 
 
     // 4G产品状态激活
