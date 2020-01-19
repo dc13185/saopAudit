@@ -1,6 +1,7 @@
 package com.asiainfo.crm.order.dao;
 
 import com.al.common.utils.DateUtil;
+import com.asiainfo.crm.order.constant.TransferStoreConstant;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,7 +29,7 @@ public class MessageOrderDao {
     JdbcTemplate soJdbcTemplate;
 
     public List<Map<String, Object>>  qryMessageOrderIdByState(String state) {
-        String sql = "select mo.ol_id from message_order mo where mo.process_state = ?  ";
+        String sql = "select mo.ol_id from message_order mo where mo.process_state = ? and mo.ol_id is not null  ";
         return saopJdbcTemplate.queryForList(sql,new Object[]{state});
     }
 
@@ -169,4 +170,54 @@ public class MessageOrderDao {
         }
 
     }
+
+    public List<String> qryWayOrder(){
+        String sql = "select mo.isale from message_order mo where mo.process_state = 'E1' and mo.isale is not null and  mo.process_result like '%未归档%'";
+        List<String>  messageOrders =  saopJdbcTemplate.queryForList(sql,String.class);
+        return messageOrders;
+    }
+
+    public void qyrTheWayByIsale(){
+        String sql = "select mo.isale from message_order mo where mo.process_state = 'E1' and mo.isale is not null and  mo.process_result like '%未归档%'";
+        List<String>  messageOrders =  saopJdbcTemplate.queryForList(sql,String.class);
+        String messageOrderStr = TransferStoreConstant.convertListToString(messageOrders);
+        //去受理查询customerOrderId
+        String qyrCustomerOrderIdSql = "select c.cust_order_id from customer_order_group_rel c where c.PROVISALE in ("+messageOrderStr+")  and c.REMARK not like '%撤单%'";
+        List<String> customerOrderIds = soJdbcTemplate.queryForList(qyrCustomerOrderIdSql,String.class);
+        String customerOrderIdStr = TransferStoreConstant.convertListToString(customerOrderIds);
+        String qryWrongIdSql = "SELECT MSG_KEY  FROM ASYN_MSG_INFO WHERE MSG_KEY in ("+customerOrderIdStr+") and MSG_TOPIC = 'so_order_archgrpfinish_10091_customer' and    MSG_CONTENT like '%未查到对应的侦听%'";
+        customerOrderIds= soJdbcTemplate.queryForList(qryWrongIdSql,String.class);
+        String  isales = TransferStoreConstant.convertListToString(customerOrderIds);
+        //查到最终没有进行合单的单子
+        String qryIsaleSql = "select c.PROVISALE from customer_order_group_rel c where c.cust_order_id in ("+isales+")";
+        List<String> isalesList = soJdbcTemplate.queryForList(qryIsaleSql,String.class);
+        String isaleStr = TransferStoreConstant.convertListToString(isalesList);
+        reTriggerByIsale(isaleStr);
+    }
+
+
+    public List<String> qryErrorCustomerOrder(String customerOrderStr){
+        String sql = "SELECT MSG_KEY  FROM ASYN_MSG_INFO WHERE MSG_KEY in ("+customerOrderStr+") and MSG_TOPIC = 'so_order_archgrpfinish_10091_customer' and    MSG_CONTENT like '%侦听不存在%'";
+        return soJdbcTemplate.queryForList(sql,String.class);
+    }
+
+
+
+    /**
+    * @Description: 重新触发合单
+    * @Param: []
+    * @Author: dong.chao
+    */
+    public void reTriggerByIsale(String isale){
+        String exeSql = "begin\n" +
+                "  for rec in (\n" +
+                "     select * from message_order mo where  mo.isale in ("+isale+") \n" +
+                "    ) loop\n" +
+                "    update message_order mo SET mo.process_state = 'W' where mo.id = rec.id;\n" +
+                "    update listen_message_order lmo set lmo.deal_flag = 'D' where  lmo.msg_content_key = rec.id;\n" +
+                "end loop;\n" +
+                "end;";
+        soJdbcTemplate.execute(exeSql);
+    }
+
 }

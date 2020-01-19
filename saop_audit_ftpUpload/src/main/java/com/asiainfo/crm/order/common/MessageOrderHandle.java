@@ -91,10 +91,16 @@ public class MessageOrderHandle {
      * @Date: 2019/12/15
      */
     public void messageOrderTimingProcessing(){
-        //处理在途
+        //处理异地销户的(88888)的不需要处理的
         messageOrderDao.execute(SqlConstant.WALL_ORDER_SQL);
         //处理E1
         messageOrderDao.execute(SqlConstant.ON_WAY_ORDER_SQL);
+        //处理E1(电渠下的)
+        messageOrderDao.execute(SqlConstant.ON_WAY_E1_ORDER_SQL);
+        //处理A或W处理失败的
+        messageOrderDao.execute(SqlConstant.ON_WAY_A_W_ORDER_SQL);
+        //处理在途的单子
+        messageOrderDao.qyrTheWayByIsale();
     }
 
 
@@ -120,12 +126,12 @@ public class MessageOrderHandle {
                 String mainOfferName = "" ,mainOfferNameStr="", offerName = "" ,offerNameStr = "";
                 Matcher matcher = RegularConstant.QRY_OFFER_NAME_PATTERN.matcher(result);
                 if(matcher.find()){
-                    offerNameStr = matcher.group(0).replaceAll("可选包\\[","").replaceAll("]与","");
+                    offerNameStr = matcher.group(0).replaceAll("可选包销售品\\[","").replaceAll("]与","");
                     offerName = offerNameStr.substring(0,offerNameStr.length()/2);
                 }
                 matcher = RegularConstant.QRY_MAIN_OFFER_NAME_PATTERN.matcher(result);
                 if(matcher.find()){
-                    mainOfferNameStr = matcher.group(0).replaceAll("套餐\\[","").replaceAll("]互斥","");
+                    mainOfferNameStr = matcher.group(0).replaceAll("套餐销售品\\[","").replaceAll("]互斥","");
                     mainOfferName = mainOfferNameStr.substring(0,mainOfferNameStr.length()/2);
                 }
                 //开始查找extOfferId
@@ -199,11 +205,15 @@ public class MessageOrderHandle {
     public void freeBackOnError(String custOrderId) throws Exception {
         String traceId = inTraceIdSaop(custOrderId);
         if(StringUtils.isEmpty(traceId)){
-            String content =  messageOrderDao.qryContentByCustOrderId(custOrderId);
-            DocumentContext jsonContext = JsonPath.parse(content);
-            List<Object> transIds = jsonContext.read("$.orderAttrs[?(@.attrId == 909077)].attrValue");
-            if (transIds.size() > 0){
-                traceId = (String) transIds.get(0);
+            try {
+                String content =  messageOrderDao.qryContentByCustOrderId(custOrderId);
+                DocumentContext jsonContext = JsonPath.parse(content);
+                List<Object> transIds = jsonContext.read("$.orderAttrs[?(@.attrId == 909077)].attrValue");
+                if (transIds.size() > 0){
+                    traceId = (String) transIds.get(0);
+                }
+            }catch (Exception e){
+
             }
         }
         //拼接入参
@@ -441,7 +451,7 @@ public class MessageOrderHandle {
             String format = "[\"%s\",\"0600000015\",\"\",\"false\"]";
             //格式化入参
             String reqStr = String.format(format,infoStr);
-            String resultStr = HttpRemoteCallClient.callRemote("http://133.0.208.1:9700/saop-service/service/saop_test_messageConvertEngine", reqStr, 0, 0, null, null);
+            String resultStr = HttpRemoteCallClient.callRemote(UrlConstant.MESSAGE_CONVERT_ENGINE_URL, reqStr, 0, 0, null, null);
             //返回格式化，修正出参，调合单接口
             JSONObject resultObj = JSONObject.parseObject(resultStr);
             JSONObject customerOrder = resultObj.getJSONObject("requestObject").getJSONObject("customerOrder");
@@ -486,7 +496,7 @@ public class MessageOrderHandle {
                 ordOfferInst.put("offerId",pCode);
             }
             String feedbackReqStr = resultObj.toJSONString();
-            String responseStr =  HttpRemoteCallClient.callRemote("http://133.0.208.1:9700/so-service/service/so_intf_saveMergeOrder", feedbackReqStr, 0, 0, null, null);
+            String responseStr =  HttpRemoteCallClient.callRemote(UrlConstant.SAVE_CUSTOMER_ORDER_URL, feedbackReqStr, 0, 0, null, null);
             JSONObject responseStrObj = JSONObject.parseObject(responseStr);
             //获取messageOrderId
             String  customerOrderId = responseStrObj.getJSONObject("resultObject").getString("customerOrderId");
@@ -514,11 +524,6 @@ public class MessageOrderHandle {
 
 
 
-    public static void main(String[] args) {
-        String specialOfferNames = PropertiesUtil.getProperty("logFile");
-        JSONArray specialOfferNamesObj = (JSONArray)JSONObject.parse(specialOfferNames);
-        System.out.println();
-    }
 
 
 

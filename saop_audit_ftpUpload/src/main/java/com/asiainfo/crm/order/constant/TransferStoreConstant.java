@@ -1,5 +1,7 @@
 package com.asiainfo.crm.order.constant;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -135,6 +137,28 @@ public class TransferStoreConstant {
             allDataTables.add(INVOKE_URL_LOG_INFO);
         }
         return  allDataTables;
+    }
+
+    
+    /** 
+    * @Description: List转带引号字符串
+    * @Param: [strlist] 
+    * @return: java.lang.String 
+    * @Author: dong.chao
+    * @Date: 2020/1/19 
+    */ 
+    public static String convertListToString(List<String> strlist){
+        StringBuffer sb = new StringBuffer();
+        if(CollectionUtils.isNotEmpty(strlist)){
+            for (int i=0;i<strlist.size();i++) {
+                if(i==0){
+                    sb.append("'").append(strlist.get(i)).append("'");
+                }else{
+                    sb.append(",").append("'").append(strlist.get(i)).append("'");
+                }
+            }
+        }
+        return sb.toString();
     }
 
 
