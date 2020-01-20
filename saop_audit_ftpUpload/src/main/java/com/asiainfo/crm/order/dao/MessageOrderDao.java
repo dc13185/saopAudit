@@ -178,7 +178,7 @@ public class MessageOrderDao {
     }
 
     public void qyrTheWayByIsale(){
-        String sql = "select mo.isale from message_order mo where mo.process_state = 'E1' and mo.isale is not null and  mo.process_result like '%未归档%'";
+        String sql = "select mo.isale from message_order mo where mo.process_state = 'E1' and mo.isale is not null and  mo.process_result like '%未归档%'  and rownum <= 2500";
         List<String>  messageOrders =  saopJdbcTemplate.queryForList(sql,String.class);
         String messageOrderStr = TransferStoreConstant.convertListToString(messageOrders);
         //去受理查询customerOrderId
