@@ -209,6 +209,9 @@ public class MessageOrderDao {
     * @Author: dong.chao
     */
     public void reTriggerByIsale(String isale){
+        if (StringUtils.isNotEmpty(isale)){
+            return;
+        }
         String exeSql = "begin\n" +
                 "  for rec in (\n" +
                 "     select * from message_order mo where  mo.isale in ("+isale+") \n" +
@@ -217,7 +220,7 @@ public class MessageOrderDao {
                 "    update listen_message_order lmo set lmo.deal_flag = 'D' where  lmo.msg_content_key = rec.id;\n" +
                 "end loop;\n" +
                 "end;";
-        soJdbcTemplate.execute(exeSql);
+        saopJdbcTemplate.execute(exeSql);
     }
 
 }

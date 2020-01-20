@@ -68,14 +68,14 @@
 		<!-- 转储，每天(0点ban) -->
 		<task:scheduled ref="ftpUploadTask" method="temporary" cron="0 30 0 * * ?" />
 
-		<!-- 处理堵单(3小时一次) -->
-		<task:scheduled ref="ftpUploadTask" method="messageOrderTimingProcessing" cron="0 0 0/3 * * ?" />
+		<!-- 处理堵单、在途单(40分时运行，一小时一次) -->
+		<task:scheduled ref="ftpUploadTask" method="messageOrderTimingProcessing" cron="0 40 * * * ?" />
 
-		<!-- 处理动作链拦截的(2小时一次) -->
+		<!-- 处理动作链拦截的(4小时一次) -->
 		<task:scheduled ref="ftpUploadTask" method="interceptMessageOrder" cron="0 0 0/4 * * ?" />
 
         <!-- 处理强制报竣的、错单的、报竣过为E1的(2小时一次) -->
-        <task:scheduled ref="ftpUploadTask" method="forceCompleted" cron="0 0 0/1 * * ?" />
+        <task:scheduled ref="ftpUploadTask" method="forceCompleted" cron="0 0 0/2 * * ?" />
 
 
 

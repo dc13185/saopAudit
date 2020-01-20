@@ -10,7 +10,7 @@ public class SqlConstant {
     /**
      * 处理堵单情况SQL
      * */
-    public static final  String WALL_ORDER_SQL = "  update   message_order mo set mo.process_state = 'I'  where mo.process_state = 'W' and mo.business_flag = '888888' ";
+    public static final  String WALL_ORDER_SQL = "  begin for rec in (  select * from message_order mo where mo.business_flag = '888888' and mo.process_state = 'W'   ) loop  update message_order mo SET mo.process_state = 'I' where mo.id = rec.id;  update listen_message_order lmo set lmo.deal_flag = 'C' where  lmo.msg_content_key = rec.id; end loop;end; ";
 
     /**
      * 需要重送订单情况SQL
