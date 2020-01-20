@@ -209,7 +209,7 @@ public class MessageOrderDao {
     * @Author: dong.chao
     */
     public void reTriggerByIsale(String isale){
-        if (StringUtils.isNotEmpty(isale)){
+        if (StringUtils.isEmpty(isale)){
             return;
         }
         String exeSql = "begin\n" +
