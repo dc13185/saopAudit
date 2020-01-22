@@ -97,10 +97,10 @@ public class MessageOrderHandle {
         messageOrderDao.execute(SqlConstant.ON_WAY_ORDER_SQL);
         //处理E1(电渠下的)
         messageOrderDao.execute(SqlConstant.ON_WAY_E1_ORDER_SQL);
-        //处理A或W处理失败的
+    /*    //处理A或W处理失败的
         messageOrderDao.execute(SqlConstant.ON_WAY_A_W_ORDER_SQL);
         //处理在途的单子
-        messageOrderDao.qyrTheWayByIsale();
+        messageOrderDao.qyrTheWayByIsale();*/
     }
 
 
